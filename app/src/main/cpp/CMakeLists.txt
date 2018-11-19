@@ -16,8 +16,15 @@ set(CMAKE_SHARED_LINKER_FLAGS
 
 add_library(native-activity SHARED native-lib.cpp)
 
-target_include_directories(native-activity PRIVATE
+target_include_directories(native-activity
+        PRIVATE
         ${ANDROID_NDK}/sources/android/native_app_glue)
+
+foreach(TARGET
+        message_bus)
+    add_subdirectory(engine/${TARGET})
+    target_include_directories(native-activity PRIVATE engine/${TARGET})
+endforeach()
 
 # add lib dependencies
 target_link_libraries(native-activity
