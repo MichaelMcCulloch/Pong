@@ -10,7 +10,8 @@ enum MessageType {
     Diamonds,
     Hearts,
     Clubs,
-    Spades };
+    Spades,
+    MessageType_MAX = Spades};
 
 struct Message {
     MessageType messageType;

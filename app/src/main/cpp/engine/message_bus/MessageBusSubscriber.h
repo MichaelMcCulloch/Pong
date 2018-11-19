@@ -13,7 +13,7 @@ public:
     void handleMessage(Message*);
 
 private:
-    MessageBus* messageBus;
+//    MessageBus* messageBus;
 };
 
 

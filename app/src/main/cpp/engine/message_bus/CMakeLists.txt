@@ -1,9 +1,11 @@
 project(MessageBus)
 
-add_library(message_bus SHARED
-        MessageBus
+
+add_library(message_bus
         MessageBusSubscriber
-        Message)
+        Message
+        MessageTest
+        MessageBus)
 
 target_link_libraries(message_bus
         android
