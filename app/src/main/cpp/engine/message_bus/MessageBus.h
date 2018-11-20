@@ -9,14 +9,11 @@
 #include <vector>
 #include <string>
 
+#include "Message.h"
 #include "MessageBusSubscriber.h"
 
 //forward declaration
 class MessageBusSubscriber;
-
-
-
-
 
 class MessageBus {
 public:
@@ -24,11 +21,13 @@ public:
     ~MessageBus(){};
     void startUp();
     void shutDown();
-    void postMessage(Message*);
 
-    void subscribe(MessageBusSubscriber, MessageType);
+    void postMessage(Message &);
+
+    void subscribe(MessageBusSubscriber &, MessageType);
 
 private:
+    std::map<MessageType, std::vector<MessageBusSubscriber>> subscribers;
     std::queue<Message> queue;
 };
 
