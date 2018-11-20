@@ -21,7 +21,7 @@ void MessageBus::postMessage(Message &message) {
     queue.push(message);
     //TODO: Break these up
     for (MessageBusSubscriber s :subscribers[message.messageType]) {
-
+        s.messageQ.push(message);
     }
 }
 

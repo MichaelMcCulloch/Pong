@@ -7,12 +7,13 @@
 #include "Message.h"
 #include "MessageBus.h"
 
-class MessageBus;
-
+class MessageBus; //fwd declaration
 class MessageBusSubscriber {
+    friend class MessageBus;
 public:
     void handleMessage(Message *);
 
 private:
-    //MessageBus* messageBus;
+    std::queue<Message> messageQ;
+    MessageBus* messageBus;
 };

@@ -12,18 +12,14 @@
 #include "Message.h"
 #include "MessageBusSubscriber.h"
 
-//forward declaration
-class MessageBusSubscriber;
-
+class MessageBusSubscriber; //fwd declaration
 class MessageBus {
 public:
     MessageBus(){};
     ~MessageBus(){};
     void startUp();
     void shutDown();
-
     void postMessage(Message &);
-
     void subscribe(MessageBusSubscriber &, MessageType);
 
 private:

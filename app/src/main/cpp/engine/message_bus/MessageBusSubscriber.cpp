@@ -3,8 +3,3 @@
 //
 
 #include "MessageBusSubscriber.h"
-
-
-void MessageBusSubscriber::handleMessage(Message *) {
-
-}
