@@ -2,7 +2,9 @@ project(MessageBus)
 
 #Build the library
 add_library(message_bus SHARED
-        MessageBus.cpp MessageBusSubscriber.cpp
+        Message
+        MessageBus
+        MessageBusSubscriber
         )
 
 #Build the tests

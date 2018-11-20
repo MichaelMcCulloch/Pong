@@ -9,27 +9,13 @@
 #include <vector>
 #include <string>
 
-enum MessageType {
-    Alpha,
-    Beta,
-    Gamma,
-    Sigma,
-    MESSAGE_TYPE_MAX = Sigma
-};
+#include "MessageBusSubscriber.h"
 
-struct Message {
-    MessageType messageType;
-    std::string messageContent;
-};
+//forward declaration
+class MessageBusSubscriber;
 
 
-class MessageBusSubscriber {
-public:
-    void handleMessage(Message *);
 
-private:
-//    MessageBus* messageBus;
-};
 
 
 class MessageBus {
