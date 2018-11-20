@@ -26,9 +26,11 @@ foreach(TARGET
     target_include_directories(native-activity PRIVATE engine/${TARGET})
 endforeach()
 
+
 # add lib dependencies
 target_link_libraries(native-activity
         android
+        message_bus
         native_app_glue
         EGL
         GLESv1_CM

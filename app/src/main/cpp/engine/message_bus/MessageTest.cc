@@ -2,9 +2,9 @@
 // Created by michael on 18/11/18.
 //
 
+#include "gtest/gtest.h"
 #include "MessageBus.h"
 
-
-void MessageBusSubscriber::handleMessage(Message *) {
-
+TEST(Zero, Zero) {
+    EXPECT_EQ(0, 1 - 1);
 }

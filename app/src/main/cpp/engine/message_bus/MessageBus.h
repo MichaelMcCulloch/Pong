@@ -2,16 +2,35 @@
 // Created by michael on 18/11/18.
 //
 
-#ifndef PONG_MESSAGEBUS_H
-#define PONG_MESSAGEBUS_H
-
-#include "Message.h"
-#include "MessageBusSubscriber.h"
-
+#pragma once
 
 #include <queue>
 #include <map>
 #include <vector>
+#include <string>
+
+enum MessageType {
+    Alpha,
+    Beta,
+    Gamma,
+    Sigma,
+    MESSAGE_TYPE_MAX = Sigma
+};
+
+struct Message {
+    MessageType messageType;
+    std::string messageContent;
+};
+
+
+class MessageBusSubscriber {
+public:
+    void handleMessage(Message *);
+
+private:
+//    MessageBus* messageBus;
+};
+
 
 class MessageBus {
 public:
@@ -20,12 +39,10 @@ public:
     void startUp();
     void shutDown();
     void postMessage(Message*);
-    void subscribe(MessageBusSubscriber*, MessageType);
+
+    void subscribe(MessageBusSubscriber, MessageType);
 
 private:
-    std::map<MessageType, std::vector<MessageBusSubscriber>> subscribers;
     std::queue<Message> queue;
 };
 
-
-#endif //PONG_MESSAGEBUS_H
