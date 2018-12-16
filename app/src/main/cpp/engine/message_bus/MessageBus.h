@@ -1,29 +1,47 @@
-//
-// Created by michael on 18/11/18.
-//
-
-#pragma once
-
+#include <iostream>
+#include <functional>
 #include <queue>
-#include <map>
 #include <vector>
-#include <string>
 
-#include "Message.h"
-#include "MessageBusSubscriber.h"
-
-class MessageBusSubscriber; //fwd declaration
-class MessageBus {
+class Message {
 public:
-    MessageBus(){};
-    ~MessageBus(){};
-    void startUp();
-    void shutDown();
-    void postMessage(Message &);
-    void subscribe(MessageBusSubscriber &, MessageType);
+    Message(const std::string event);
+
+    std::string getEvent();
 
 private:
-    std::map<MessageType, std::vector<MessageBusSubscriber>> subscribers;
-    std::queue<Message> queue;
+    std::string messageEvent;
 };
 
+class MessageBus {
+public:
+    MessageBus() {};
+
+    ~MessageBus() {};
+
+    void addReceiver(std::function<void(Message)> messageReceiver);
+
+    void sendMessage(Message message);
+
+    void notify();
+
+private:
+    std::vector<std::function<void(Message)>> receivers;
+    std::queue<Message> messages;
+};
+
+class BusNode {
+public:
+    BusNode(MessageBus *messageBus);
+
+    virtual void update() {}
+
+protected:
+    MessageBus *messageBus;
+
+    std::function<void(Message)> getNotifyFunc();
+
+    void send(Message message);
+
+    virtual void onNotify(Message message);
+};

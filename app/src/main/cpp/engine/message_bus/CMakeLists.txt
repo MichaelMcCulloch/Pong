@@ -1,11 +1,7 @@
 project(MessageBus)
 
 #Build the library
-add_library(message_bus SHARED
-        Message
-        MessageBus
-        MessageBusSubscriber
-        )
+add_library(message_bus SHARED MessageBus)
 
 #Build the tests
 add_executable(message_test MessageTest.cc)

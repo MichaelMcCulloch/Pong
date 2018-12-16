@@ -1,35 +1,49 @@
-//
-// Created by michael on 18/11/18.
-//
-
 #include "MessageBus.h"
 
+Message::Message(const std::string event) {
+    messageEvent = event;
+}
 
-void MessageBus::startUp() {
-    //Create Pointers for subscriber list
-    for (int i = 0; i <= MESSAGE_TYPE_MAX; ++i) {
-        subscribers[(MessageType) i] = std::vector<MessageBusSubscriber>();
+std::string Message::getEvent() {
+    return messageEvent;
+}
+
+void MessageBus::addReceiver(std::function<void(Message)> messageReceiver) {
+    receivers.push_back(messageReceiver);
+}
+
+void MessageBus::sendMessage(Message message) {
+    messages.push(message);
+}
+
+void MessageBus::notify() {
+    while (!messages.empty()) { //For each message, run whichever function the receiver has registered
+        for (auto recFun = receivers.begin(); recFun != receivers.end(); recFun++) {
+            (*recFun)(messages.front());
+        }
+
+        messages.pop();
     }
 }
 
-void MessageBus::shutDown() {
-    free(&subscribers);
-    free(&queue);
+BusNode::BusNode(MessageBus *messageBus) {
+    this->messageBus = messageBus;
+    this->messageBus->addReceiver(this->getNotifyFunc());
 }
 
-void MessageBus::postMessage(Message &message) {
-    queue.push(message);
-    //TODO: Break these up
-    for (MessageBusSubscriber s :subscribers[message.messageType]) {
-        s.messageQ.push(message);
-    }
+std::function<void(Message)> BusNode::getNotifyFunc() {
+    //lambda function which takes a message and calls the class onNotify Function with it
+    auto messageListener = [=](Message message) -> void {
+        this->onNotify(message);
+    };
+    return messageListener;
 }
 
-/**
- * Add caller to message list;
- */
-void MessageBus::subscribe(MessageBusSubscriber &subscriber, MessageType messageType) {
-    subscribers[messageType].push_back(subscriber);
+void BusNode::send(Message message) {
+    messageBus->sendMessage(message);
 }
 
-
+void BusNode::onNotify(Message message) {
+    // Do something here. Your choice. But you could do this.
+    // std::cout << "Siopao! Siopao! Siopao! (Someone forgot to implement onNotify().)" << std::endl;
+}

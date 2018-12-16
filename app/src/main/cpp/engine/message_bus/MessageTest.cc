@@ -5,8 +5,44 @@
 #include "gtest/gtest.h"
 #include "MessageBus.h"
 
-TEST(Zero, Zero) {
-    EXPECT_EQ(0, 1 - 1);
+//Not really a test
+TEST(A, B) {
+
+    //receive from ComponentB
+    class ComponentA : public BusNode {
+    public:
+        ComponentA(MessageBus *messageBus) : BusNode(messageBus) {}
+
+    private:
+        void onNotify(Message message) {
+            std::cout << "I received: " << message.getEvent() << std::endl;
+        }
+    };
+
+    //Send to ComponentA
+    class ComponentB : public BusNode {
+    public:
+        ComponentB(MessageBus *messageBus) : BusNode(messageBus) {}
+
+        void update() {
+            Message greeting("hi");
+            send(greeting);
+        }
+
+    private:
+        void onNotify(Message message) {
+            std::cout << "I received: " << message.getEvent() << std::endl;
+        }
+    };
+
+    MessageBus messageBus;
+    ComponentA compA(&messageBus);
+    ComponentB compB(&messageBus);
+
+    compB.update();
+    messageBus.notify();
+    compA.update();
+    EXPECT_EQ(1, 1);
 }
 /**
  * NOTE:
