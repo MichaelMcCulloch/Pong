@@ -26,6 +26,7 @@ void MessageBus::notify() {
     }
 }
 
+
 BusNode::BusNode(MessageBus *messageBus) {
     this->messageBus = messageBus;
     this->messageBus->addReceiver(this->getNotifyFunc());
