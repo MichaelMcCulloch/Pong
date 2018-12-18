@@ -6,15 +6,62 @@
 \pagebreak
 \tableofcontents
 \pagebreak
-\section{Project Description}
-This game design document describes the details for a 
-top down touch game exactly like Pong. The screen is divided in half by a vertical white bar. On the left side is the touch input space, score and paddle for P1, on the right is the same for P2. Paddles follow touch input on the half containing that paddle. Players compete by trying to get the ball out of bounds on the opposing players side.
-
-\section{Objects}
-\subsection{Paddle}
-\subsection{Ball}
-\subsection{Score}
-
-\section{Sound}
-
+\section{Game Overview}
+    \subsection{Concept}
+    Tennis like competitive game.
+    \subsection{Genre}
+    Classic Arcade Game.
+    \subsection{Target Audience}
+    Your senile grandmother.
+    \subsection{Game Flow Summary}
+    Two primary screens: 
+    \begin{itemize}
+        \item Menu. Offers single- and multiplayer Options.
+        \item Game. Playing the game.
+        \item Pause. Option to Resume, Restart, or Quit.
+    \end{itemize}
+    \subsection{Look and Feel}
+    Classic arcade game, complete with 16-bit sound effects.
+\section{Gameplay \& Mechanics}
+    \subsection{Gameplay}
+        \subsubsection{Progression}
+        As time elapses since the last point scored, the ball accelerates to $\infty$. Incremental acceleration occures upon each paddle-ball collision.
+        \subsubsection{Objectives}
+        Bounce the ball out of bounds on the opposing side.
+    \subsection{Mechanics}
+        \subsubsection{Objects, Physics \& Movement}
+        \begin{itemize}
+            \item[\textbf{Ball}] Constant velocity except when accelerating on collision with paddle. Bounces across norm of collided surface.
+            \item[\textbf{Paddle}] Vertical movement only. Has mass $\rightarrow$ inertia (ie. Maximum rate of acceleration).
+            \item[\textbf{Walls}] Top and bottom of screen only. Has collisions.
+            \item[\textbf{Score Counter}] Positioned on the top of the screen, on the left and right of the Vertical Divider for P1 and P2, respectively.
+            \item[\textbf{Vertical Divider}] Aesthetic purposes only. No collisions. 
+        \end{itemize}
+        \subsubsection{Actions}
+            Paddle on right follows Vertical touch movement on right. Same on left.
+    \subsection{Game Options}
+    \subsection{Replay \& Saving}
+    \subsection{Easter Eggs \& Cheats}
+\section{Story, Setting \& Character}
+    \subsection{Story \& Narative}
+    \subsection{Game World}
+        \subsubsection{Look \& Feel}
+        \subsubsection{Areas}
+    \subsection{Characters}
+\section{Levels}
+\section{Interface}
+    \subsection{Visual System}
+        \subsubsection{Menu}
+        \subsubsection{Game Interface}
+    \subsection{Control System}
+    \subsection{Audio, Music \& Sound}
+    \subsection{Help System}
+\section{Artificial Intelligence}
+    \subsection{Opponent}
+\section{Technical}
+    \subsection{Target Hardware}
+    Android
+    \subsection{Development Hardware \& Software}
+\section{Game Assets}
+    \subsection{Style}
 \end{document}
