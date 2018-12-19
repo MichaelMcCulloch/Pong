@@ -8,17 +8,16 @@
 \pagebreak
 \section{Game Overview}
     \subsection{Concept}
-    Tennis like competitive game.
+    Table-tennis like competitive game.
     \subsection{Genre}
     Classic Arcade Game.
     \subsection{Target Audience}
     Your senile grandmother.
     \subsection{Game Flow Summary}
-    Two primary screens: 
     \begin{itemize}
-        \item Menu. Offers single- and multiplayer Options.
-        \item Game. Playing the game.
-        \item Pause. Option to Resume, Restart, or Quit.
+        \item[\textbf{Menu}] Offers single- and multiplayer Options.
+        \item[\textbf{Game}] Playing the game.
+        \item[\textbf{Pause}] Option to Resume, Restart, or Quit.
     \end{itemize}
     \subsection{Look and Feel}
     Classic arcade game, complete with 16-bit sound effects.
@@ -27,7 +26,7 @@
         \subsubsection{Progression}
         As time elapses since the last point scored, the ball accelerates to $\infty$. Incremental acceleration occures upon each paddle-ball collision.
         \subsubsection{Objectives}
-        Bounce the ball out of bounds on the opposing side.
+        Bounce the ball out of bounds on the opposing side to score a point
     \subsection{Mechanics}
         \subsubsection{Objects, Physics \& Movement}
         \begin{itemize}
@@ -38,30 +37,37 @@
             \item[\textbf{Vertical Divider}] Aesthetic purposes only. No collisions. 
         \end{itemize}
         \subsubsection{Actions}
-            Paddle on right follows Vertical touch movement on right. Same on left.
+        Paddles follow movement of touch. Left paddle follows touch input on left side, Right paddle follows right.
     \subsection{Game Options}
-    \subsection{Replay \& Saving}
-    \subsection{Easter Eggs \& Cheats}
-\section{Story, Setting \& Character}
-    \subsection{Story \& Narative}
-    \subsection{Game World}
-        \subsubsection{Look \& Feel}
-        \subsubsection{Areas}
-    \subsection{Characters}
-\section{Levels}
 \section{Interface}
     \subsection{Visual System}
         \subsubsection{Menu}
+        Text enclosed in a box.
+        \begin{itemize}
+            \item[\textbf{Singleplayer}] Player takes P1 paddle, AI assumes control of P2. Difficulty option presented. Difficulty = Easy, Medium, Hard, Impossible.
+            \item[\textbf{Multiplayer}] Competitive multiplayer. Both paddles receive input from touch on their respective sides of the screen.
+        \end{itemize}
+        \subsubsection{Pause Menu}
+        In game, tap the option button to open the pause menu.
+        \begin{itemize}
+            \item[\textbf{Resume}] Unpause the game
+            \item[\textbf{Restart}] Restart the game
+            \item[\textbf{Quit}] Exit the game.
+        \end{itemize}
         \subsubsection{Game Interface}
+        Play area is entire screen. Can play in landscape/portrait, and alternate during play. Bar bisects play area along shortest edge. In landscape, score sits just under top of screen, adjacent to the dividing bar. In portrait, score lies above and below bar on right hand side. Pause menu activated by tapping pause button.
     \subsection{Control System}
+    Bar bisects play area into A1 and A2. Paddle $P_i$ is follows touch input in area $A_i$. Paddle.Y always equal to Touch.Y, so the player can tap to snap (within acceleration limits) the paddle to desired position.
     \subsection{Audio, Music \& Sound}
-    \subsection{Help System}
+    \begin{itemize}
+        \item Ball bounces of any object.
+        \item Ball out of bounds.
+        \item Any button pressed.
+    \end{itemize}
 \section{Artificial Intelligence}
     \subsection{Opponent}
+        Paddle.Y$_t$ = Ball.Y$_{t-X}$ where X is a fixed time delay for some difficulty. On easy difficulty, the time delay is large. On impossible, there is no delay.
 \section{Technical}
     \subsection{Target Hardware}
     Android
-    \subsection{Development Hardware \& Software}
-\section{Game Assets}
-    \subsection{Style}
 \end{document}
