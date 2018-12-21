@@ -32,13 +32,13 @@
         \subsubsection{Objects, Physics \& Movement}
         \begin{itemize}
             \item[\textbf{Ball}] Constant velocity except when accelerating on collision with paddle. Bounces across norm of collided surface.
-            \item[\textbf{Paddle}] Vertical movement only. Has mass $\rightarrow$ inertia (ie. Maximum rate of acceleration).
+            \item[\textbf{Paddle}] Vertical movement only. Has no mass.
             \item[\textbf{Walls}] Top and bottom of screen only. Has collisions.
             \item[\textbf{Score Counter}] Positioned on the top of the screen, on the left and right of the Vertical Divider for P1 and P2, respectively.
             \item[\textbf{Vertical Divider}] Aesthetic purposes only. No collisions. 
         \end{itemize}
         \subsubsection{Actions}
-            Paddle on right follows Vertical touch movement on right. Same on left.
+            Paddle on right follows touch.x in portrait mode, touch.y in landscape mode.
     \subsection{Game Options}
     \subsection{Replay \& Saving}
     \subsection{Easter Eggs \& Cheats}
