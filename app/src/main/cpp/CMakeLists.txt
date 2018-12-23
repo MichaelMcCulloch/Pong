@@ -23,12 +23,12 @@ target_include_directories(native-activity
 foreach(TARGET
         message_bus
         renderer)
-    add_subdirectory(engine/${TARGET})
-    target_include_directories(native-activity PRIVATE engine/${TARGET})
+    add_subdirectory(engine/${TARGET}) #Build target Library
+    target_include_directories(native-activity PRIVATE engine/${TARGET}) #Include it
 endforeach()
 
 
-# add lib dependencies
+#Link to all created libraries
 target_link_libraries(native-activity
         android
         message_bus

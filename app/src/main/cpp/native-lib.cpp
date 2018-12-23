@@ -34,8 +34,8 @@
 #include "MessageBus.h"
 #include "Renderer.h"
 
-#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
-#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
+//#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
+//#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
 
 #define TESTING
 
@@ -70,7 +70,6 @@ struct engine {
     EGLDisplay display;
     EGLSurface surface;
     EGLContext context;
-    GLuint shader;
     int32_t width;
     int32_t height;
     struct saved_state state;
@@ -245,29 +244,6 @@ static int engine_init_display(struct engine *engine) {
     glEnable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
 
-    //prepare the shaders
-    std::string vertexSource = "attribute vec4 vPosition;   \n"
-                               "void main()                 \n"
-                               "{"
-                               "    gl_Position=vPosition;  \n"
-                               "}";
-    std::string fragmentSource = "precision mediump float;                   \n"
-                                 "void main()                                \n"
-                                 "{                                          \n"
-                                 "  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); \n"
-                                 "}                                          \n";
-    if (vertexSource.empty() || fragmentSource.empty())
-        return -1;
-
-    auto vertex = CompileShader(GL_VERTEX_SHADER, vertexSource);
-    auto fragment = CompileShader(GL_FRAGMENT_SHADER, fragmentSource);
-    auto program = LinkProgram(vertex, fragment);
-
-    if (CheckGLErrors()) {
-        return -1;
-    } else {
-        engine->shader = program;
-    }
 
     return 0;
 }
@@ -281,7 +257,7 @@ static void engine_draw_frame(struct engine *engine) {
         return;
     }
 
-    // Just fill the screen with a color.
+
     glClearColor(((float) engine->state.x) / engine->width, engine->state.angle,
                  ((float) engine->state.y) / engine->height, 1);
     glClear(GL_COLOR_BUFFER_BIT);
