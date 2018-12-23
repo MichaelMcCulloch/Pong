@@ -67,223 +67,10 @@ struct engine {
     ASensorEventQueue *sensorEventQueue;
 
     int animating;
-    EGLDisplay display;
-    EGLSurface surface;
-    EGLContext context;
-    int32_t width;
-    int32_t height;
+    Renderer renderer;
     struct saved_state state;
 };
 
-bool CheckGLErrors() {
-    bool error = false;
-    for (GLenum flag = glGetError(); flag != GL_NO_ERROR; flag = glGetError()) {
-        LOGW("OpenGL ERROR:");
-        switch (flag) {
-            case GL_INVALID_ENUM:
-                LOGW("GL_INVALID_ENUM");
-                break;
-            case GL_INVALID_VALUE:
-                LOGW("GL_INVALID_VALUE");
-                break;
-            case GL_INVALID_OPERATION:
-                LOGW("GL_INVALID_OPERATION");
-                break;
-            case GL_INVALID_FRAMEBUFFER_OPERATION:
-                LOGW("GL_INVALID_FRAMEBUFFER_OPERATION");
-                break;
-            case GL_OUT_OF_MEMORY:
-                LOGW("GL_OUT_OF_MEMORY");
-                break;
-            default:
-                LOGW("[unknown error code]");
-        }
-        error = true;
-    }
-    return error;
-}
-
-
-// creates and returns a shader object compiled from the given source
-GLuint CompileShader(GLenum shaderType, const std::string &source) {
-    // allocate shader object name
-    GLuint shaderObject = glCreateShader(shaderType);
-
-    // try compiling the source as a shader of the given type
-    const GLchar *source_ptr = source.c_str();
-    glShaderSource(shaderObject, 1, &source_ptr, 0);
-    glCompileShader(shaderObject);
-
-    // retrieve compile status
-    GLint status;
-    glGetShaderiv(shaderObject, GL_COMPILE_STATUS, &status);
-    if (status == GL_FALSE) {
-        GLint length;
-        glGetShaderiv(shaderObject, GL_INFO_LOG_LENGTH, &length);
-        std::string info(length, ' ');
-        glGetShaderInfoLog(shaderObject, info.length(), &length, &info[0]);
-        LOGW("ERROR compiling shader:\n\n %s \n %s", source.c_str(), info.c_str());
-
-    }
-
-    return shaderObject;
-}
-
-// creates and returns a program object linked from vertex and fragment shaders
-GLuint LinkProgram(GLuint vertexShader, GLuint fragmentShader) {
-    // allocate program object name
-    GLuint programObject = glCreateProgram();
-
-    // attach provided shader objects to this program
-    if (vertexShader)
-        glAttachShader(programObject, vertexShader);
-    if (fragmentShader)
-        glAttachShader(programObject, fragmentShader);
-
-    // try linking the program with given attachments
-    glLinkProgram(programObject);
-
-    // retrieve link status
-    GLint status;
-    glGetProgramiv(programObject, GL_LINK_STATUS, &status);
-    if (status == GL_FALSE) {
-        GLint length;
-        glGetProgramiv(programObject, GL_INFO_LOG_LENGTH, &length);
-        std::string info(length, ' ');
-        glGetProgramInfoLog(programObject, info.length(), &length, &info[0]);
-        LOGW("ERROR linking shader program: \n %s", info.c_str());
-    }
-
-    return programObject;
-}
-
-/**
- * Initialize an EGL context for the current display.
- */
-static int engine_init_display(struct engine *engine) {
-    // initialize OpenGL ES and EGL
-
-    /*
-     * Here specify the attributes of the desired configuration.
-     * Below, we select an EGLConfig with at least 8 bits per color
-     * component compatible with on-screen windows
-     */
-    const EGLint attribs[] = {
-            EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
-            EGL_BLUE_SIZE, 8,
-            EGL_GREEN_SIZE, 8,
-            EGL_RED_SIZE, 8,
-            EGL_NONE
-    };
-    EGLint w, h, format;
-    EGLint numConfigs;
-    EGLConfig config;
-    EGLSurface surface;
-    EGLContext context;
-
-    EGLDisplay display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
-
-    eglInitialize(display, 0, 0);
-
-    /* Here, the application chooses the configuration it desires.
-     * find the best match if possible, otherwise use the very first one
-     */
-    eglChooseConfig(display, attribs, nullptr, 0, &numConfigs);
-    std::unique_ptr<EGLConfig[]> supportedConfigs(new EGLConfig[numConfigs]);
-    assert(supportedConfigs);
-    eglChooseConfig(display, attribs, supportedConfigs.get(), numConfigs, &numConfigs);
-    assert(numConfigs);
-    auto i = 0;
-    for (; i < numConfigs; i++) {
-        auto &cfg = supportedConfigs[i];
-        EGLint r, g, b, d;
-        if (eglGetConfigAttrib(display, cfg, EGL_RED_SIZE, &r) &&
-            eglGetConfigAttrib(display, cfg, EGL_GREEN_SIZE, &g) &&
-            eglGetConfigAttrib(display, cfg, EGL_BLUE_SIZE, &b) &&
-            eglGetConfigAttrib(display, cfg, EGL_DEPTH_SIZE, &d) &&
-            r == 8 && g == 8 && b == 8 && d == 0) {
-
-            config = supportedConfigs[i];
-            break;
-        }
-    }
-    if (i == numConfigs) {
-        config = supportedConfigs[0];
-    }
-
-    /* EGL_NATIVE_VISUAL_ID is an attribute of the EGLConfig that is
-     * guaranteed to be accepted by ANativeWindow_setBuffersGeometry().
-     * As soon as we picked a EGLConfig, we can safely reconfigure the
-     * ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID. */
-    eglGetConfigAttrib(display, config, EGL_NATIVE_VISUAL_ID, &format);
-    surface = eglCreateWindowSurface(display, config, engine->app->window, NULL);
-    context = eglCreateContext(display, config, NULL, NULL);
-
-    if (eglMakeCurrent(display, surface, surface, context) == EGL_FALSE) {
-        LOGW("Unable to eglMakeCurrent");
-        return -1;
-    }
-
-    eglQuerySurface(display, surface, EGL_WIDTH, &w);
-    eglQuerySurface(display, surface, EGL_HEIGHT, &h);
-
-    engine->display = display;
-    engine->context = context;
-    engine->surface = surface;
-    engine->width = w;
-    engine->height = h;
-    engine->state.angle = 0;
-
-    // Check openGL on the system
-    auto opengl_info = {GL_VENDOR, GL_RENDERER, GL_VERSION, GL_EXTENSIONS};
-    for (auto name : opengl_info) {
-        auto info = glGetString(name);
-        LOGI("OpenGL Info: %s", info);
-    }
-    // Initialize GL state.
-    glEnable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);
-
-
-    return 0;
-}
-
-/**
- * Just the current frame in the display.
- */
-static void engine_draw_frame(struct engine *engine) {
-    if (engine->display == NULL) {
-        // No display.
-        return;
-    }
-
-
-    glClearColor(((float) engine->state.x) / engine->width, engine->state.angle,
-                 ((float) engine->state.y) / engine->height, 1);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    eglSwapBuffers(engine->display, engine->surface);
-}
-
-/**
- * Tear down the EGL context currently associated with the display.
- */
-static void engine_term_display(struct engine *engine) {
-    if (engine->display != EGL_NO_DISPLAY) {
-        eglMakeCurrent(engine->display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
-        if (engine->context != EGL_NO_CONTEXT) {
-            eglDestroyContext(engine->display, engine->context);
-        }
-        if (engine->surface != EGL_NO_SURFACE) {
-            eglDestroySurface(engine->display, engine->surface);
-        }
-        eglTerminate(engine->display);
-    }
-    engine->animating = 0;
-    engine->display = EGL_NO_DISPLAY;
-    engine->context = EGL_NO_CONTEXT;
-    engine->surface = EGL_NO_SURFACE;
-}
 
 /**
  * Process the next input event.
@@ -315,13 +102,13 @@ static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
         case APP_CMD_INIT_WINDOW:
             // The window is being shown, get it ready.
             if (engine->app->window != NULL) {
-                engine_init_display(engine);
-                engine_draw_frame(engine);
+                engine->renderer.startUp(app->window);
+                engine->renderer.drawFrame(engine->state.x, engine->state.y, engine->state.angle);
             }
             break;
         case APP_CMD_TERM_WINDOW:
             // The window is being hidden or closed, clean it up.
-            engine_term_display(engine);
+            engine->renderer.shutDown();
             break;
         case APP_CMD_GAINED_FOCUS:
             // When our app gains focus, we start monitoring the accelerometer.
@@ -343,7 +130,7 @@ static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
             }
             // Also stop animating.
             engine->animating = 0;
-            engine_draw_frame(engine);
+            engine->renderer.drawFrame(engine->state.x, engine->state.y, engine->state.angle);
             break;
     }
 }
@@ -412,9 +199,13 @@ void android_main(struct android_app* state) {
     if (RUN_ALL_TESTS()) return;
 
 #endif
-    struct engine engine;
+    //TODO: Initialize MessageBus, renderer
 
+
+    struct engine engine;
     memset(&engine, 0, sizeof(engine));
+    engine.renderer = Renderer();
+
     state->userData = &engine;
     state->onAppCmd = engine_handle_cmd;
     state->onInputEvent = engine_handle_input;
@@ -469,7 +260,7 @@ void android_main(struct android_app* state) {
 
             // Check if we are exiting.
             if (state->destroyRequested != 0) {
-                engine_term_display(&engine);
+                engine.renderer.shutDown();
                 return;
             }
         }
@@ -483,7 +274,7 @@ void android_main(struct android_app* state) {
 
             // Drawing is throttled to the screen update rate, so there
             // is no need to do timing here.
-            engine_draw_frame(&engine);
+            engine.renderer.drawFrame(engine.state.x, engine.state.y, engine.state.angle);
         }
     }
 }

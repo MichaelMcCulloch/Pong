@@ -14,9 +14,14 @@ public:
     Renderer() {}
     ~Renderer() {}
 
-    void startUp(ANativeWindow *window);
+    void startUp(ANativeWindow*);
 
     void shutDown();
+
+    int init_display(ANativeWindow*);
+
+    void drawFrame(int, int, float);
+
 private:
 
     EGLDisplay display;
@@ -27,10 +32,6 @@ private:
     int32_t height;
 
     void term_display();
-
-    void drawFrame();
-
-    int init_display(ANativeWindow *window);
 
     int prepareOpenGL();
 

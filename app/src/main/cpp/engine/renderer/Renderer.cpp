@@ -139,22 +139,22 @@ int Renderer::prepareShaders() {
 /**
  * Just the current frame in the display.
  */
-void Renderer::drawFrame() {
+void Renderer::drawFrame(int x, int y, float angle) {
 
-    /*
-     * TODO: draw a triangle which follows touch
-    if (engine->display == NULL) {
+
+     // TODO: draw a triangle which follows touch
+    if (display == NULL) {
         // No display.
         return;
     }
 
 
-    glClearColor(((float) engine->state.x) / engine->width, engine->state.angle,
-                 ((float) engine->state.y) / engine->height, 1);
+    glClearColor(((float) x /width), angle,
+                 ((float) y/height), 1);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    eglSwapBuffers(engine->display, engine->surface);
-     */
+    eglSwapBuffers(display, surface);
+
 }
 
 /**
