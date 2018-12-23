@@ -27,11 +27,6 @@ void MessageBus::notify() {
 }
 
 
-BusNode::BusNode(MessageBus *messageBus) {
-    this->messageBus = messageBus;
-    this->messageBus->addReceiver(this->getNotifyFunc());
-}
-
 std::function<void(Message)> BusNode::getNotifyFunc() {
     //lambda function which takes a message and calls the class onNotify Function with it
     auto messageListener = [=](Message message) -> void {
@@ -47,4 +42,13 @@ void BusNode::send(Message message) {
 void BusNode::onNotify(Message message) {
     // Do something here. Your choice. But you could do this.
     // std::cout << "Siopao! Siopao! Siopao! (Someone forgot to implement onNotify().)" << std::endl;
+}
+
+void BusNode::startUp(MessageBus *messageBus) {
+    this->messageBus = messageBus;
+    this->messageBus->addReceiver(this->getNotifyFunc());
+}
+
+void BusNode::shutdown() {
+
 }

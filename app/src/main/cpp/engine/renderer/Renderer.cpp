@@ -3,7 +3,9 @@
 
 
 //TODO: throw errors and quit.
-void Renderer::startUp(ANativeWindow *window) {
+void Renderer::startUp(ANativeWindow *window, MessageBus* m) {
+    BusNode::startUp(m);
+
     if (init_display(window)) return;
     if (prepareOpenGL()) return;
     if (prepareShaders()) return;
@@ -176,6 +178,10 @@ void Renderer::term_display() {
     display = EGL_NO_DISPLAY;
     context = EGL_NO_CONTEXT;
     surface = EGL_NO_SURFACE;
+}
+
+void Renderer::onNotify(Message message) {
+    BusNode::onNotify(message);
 }
 
 

@@ -10,7 +10,9 @@ target_link_libraries(glutil
         GLESv3)
 
 add_library(renderer SHARED Renderer)
+target_include_directories(renderer PRIVATE ../message_bus/)
 target_link_libraries(renderer
         android
         glutil
+        message_bus
         log)

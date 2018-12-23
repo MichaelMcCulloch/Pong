@@ -18,13 +18,10 @@ private:
 class MessageBus {
 public:
     MessageBus() {};
-
     ~MessageBus() {};
 
     void addReceiver(std::function<void(Message)> messageReceiver);
-
     void sendMessage(Message message);
-
     void notify();
 
 private:
@@ -34,8 +31,8 @@ private:
 
 class BusNode {
 public:
-    BusNode(MessageBus *messageBus);
-
+    void startUp(MessageBus*);
+    void shutdown();
     virtual void update() {}
 
 protected:

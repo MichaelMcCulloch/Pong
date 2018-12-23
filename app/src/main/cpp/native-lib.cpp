@@ -34,7 +34,7 @@
 //#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
 //#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
 
-#define TESTING
+//#define TESTING
 
 #ifdef TESTING
 
@@ -64,7 +64,10 @@ struct engine {
     ASensorEventQueue *sensorEventQueue;
 
     int animating;
-    Renderer renderer;
+
+    MessageBus* messageBus;
+    Renderer* renderer;
+
     struct saved_state state;
 };
 
@@ -99,13 +102,13 @@ static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
         case APP_CMD_INIT_WINDOW:
             // The window is being shown, get it ready.
             if (engine->app->window != NULL) {
-                engine->renderer.startUp(app->window);
-                engine->renderer.drawFrame(engine->state.x, engine->state.y, engine->state.angle);
+                engine->renderer->startUp(app->window,engine->messageBus);
+                engine->renderer->drawFrame(engine->state.x, engine->state.y, engine->state.angle);
             }
             break;
         case APP_CMD_TERM_WINDOW:
             // The window is being hidden or closed, clean it up.
-            engine->renderer.shutDown();
+            engine->renderer->shutDown();
             break;
         case APP_CMD_GAINED_FOCUS:
             // When our app gains focus, we start monitoring the accelerometer.
@@ -127,7 +130,7 @@ static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
             }
             // Also stop animating.
             engine->animating = 0;
-            engine->renderer.drawFrame(engine->state.x, engine->state.y, engine->state.angle);
+            engine->renderer->drawFrame(engine->state.x, engine->state.y, engine->state.angle);
             break;
     }
 }
@@ -201,7 +204,9 @@ void android_main(struct android_app* state) {
 
     struct engine engine;
     memset(&engine, 0, sizeof(engine));
-    engine.renderer = Renderer();
+    engine.messageBus = new MessageBus();
+    engine.renderer = new Renderer();
+
 
     state->userData = &engine;
     state->onAppCmd = engine_handle_cmd;
@@ -257,7 +262,7 @@ void android_main(struct android_app* state) {
 
             // Check if we are exiting.
             if (state->destroyRequested != 0) {
-                engine.renderer.shutDown();
+                engine.renderer->shutDown();
                 return;
             }
         }
@@ -271,7 +276,7 @@ void android_main(struct android_app* state) {
 
             // Drawing is throttled to the screen update rate, so there
             // is no need to do timing here.
-            engine.renderer.drawFrame(engine.state.x, engine.state.y, engine.state.angle);
+            engine.renderer->drawFrame(engine.state.x, engine.state.y, engine.state.angle);
         }
     }
 }
