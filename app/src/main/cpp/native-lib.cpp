@@ -31,8 +31,21 @@
 #include <android/log.h>
 #include <android_native_app_glue.h>
 
+#include "MessageBus.h"
+#include "Renderer.h"
+
 #define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
 #define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
+
+#define TESTING
+
+#ifdef TESTING
+
+#include "gtest/gtest.h"
+#include "MessageTest.h"
+#include "RendererTest.h"
+
+#endif
 
 /**
  * Our saved state data.
@@ -308,6 +321,16 @@ ASensorManager *AcquireASensorManagerInstance(android_app *app) {
  * event loop for receiving input events and doing other things.
  */
 void android_main(struct android_app* state) {
+
+#ifdef TESTING
+    int argc = 1;
+
+    char *name = (char *) "Testing";
+    char **argv = &name;
+    ::testing::InitGoogleTest(&argc, argv);
+    if (RUN_ALL_TESTS()) return;
+
+#endif
     struct engine engine;
 
     memset(&engine, 0, sizeof(engine));
