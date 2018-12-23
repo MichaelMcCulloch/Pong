@@ -21,7 +21,8 @@ target_include_directories(native-activity
         ${ANDROID_NDK}/sources/android/native_app_glue)
 
 foreach(TARGET
-        message_bus)
+        message_bus
+        renderer)
     add_subdirectory(engine/${TARGET})
     target_include_directories(native-activity PRIVATE engine/${TARGET})
 endforeach()
@@ -31,7 +32,9 @@ endforeach()
 target_link_libraries(native-activity
         android
         message_bus
+        renderer
         native_app_glue
+        gtest
         EGL
         GLESv1_CM
         log)
