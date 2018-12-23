@@ -35,6 +35,4 @@ target_link_libraries(native-activity
         renderer
         native_app_glue
         gtest
-        EGL
-        GLESv3
         log)
