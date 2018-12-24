@@ -27,11 +27,12 @@ int Renderer::initDisplay(ANativeWindow *window) {
      * component compatible with on-screen windows
      */
     const EGLint attribs[] = {
+            EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
             EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
             EGL_BLUE_SIZE, 8,
             EGL_GREEN_SIZE, 8,
             EGL_RED_SIZE, 8,
-            EGL_CONTEXT_CLIENT_VERSION, 2,
+            EGL_DEPTH_SIZE, 16,
             EGL_NONE
     };
     EGLint w, h, format;
@@ -76,7 +77,9 @@ int Renderer::initDisplay(ANativeWindow *window) {
      * ANativeWindow buffers to match, using EGL_NATIVE_VISUAL_ID. */
     eglGetConfigAttrib(disp, config, EGL_NATIVE_VISUAL_ID, &format);
     surf = eglCreateWindowSurface(disp, config, window, NULL);
-    cntxt = eglCreateContext(disp, config, NULL, NULL);
+    EGLint attribList[] = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL_NONE }; // OpenGL 2.0
+
+    cntxt = eglCreateContext(disp, config, NULL, attribList);
 
 
     if (eglMakeCurrent(disp, surf, surf, cntxt) == EGL_FALSE) {
