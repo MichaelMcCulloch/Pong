@@ -160,12 +160,17 @@ void Renderer::drawFrame(int x, int y, float angle) {
         return;
     }
 
+    float xOff = (float)x / (float)width;
+    float yOff = (float)y / (float)height;
+    glm::vec2 fingerIsAt = glm::vec2((xOff * 2) -1, -(yOff*2) +1);
+
     //Create Triangle
     std::vector<glm::vec2> pts = {
-            glm::vec2(-1, -sqrt(3) / 2),
-            glm::vec2(1, -sqrt(3) / 2),
-            glm::vec2(0, sqrt(3) / 2)
+            glm::vec2(fingerIsAt.x - .5, fingerIsAt.y - sqrt(3) / 6),
+            glm::vec2(fingerIsAt.x + .5, fingerIsAt.y - sqrt(3) / 6),
+            glm::vec2(fingerIsAt.x + 0, fingerIsAt.y + sqrt(3) / 6)
     };
+
 
     std::vector<glm::vec3> col = {
             glm::vec3(1, 0, 0),

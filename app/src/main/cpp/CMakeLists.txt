@@ -37,9 +37,6 @@ target_include_directories(native-activity PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${ANDROID_NDK}/sources/android/native_app_glue)
 
-
-
-
 #Link to all created libraries
 target_link_libraries(native-activity
         android
