@@ -175,8 +175,8 @@ void Renderer::drawFrame(int x, int y, float angle) {
 
 
     Geometry triangle;
-    if (!InitializeVAO(&triangle)) {
-        LOGW("FAILED TO INITIALIZE TRIANGLE");
+    if (!InitializeVAO(&triangle)){
+        LOGW("RENDERER: FAILED TO INITIALIZE VAO");
         return;
     }
     if (!LoadGeometry(&triangle, pts.data(), col.data(), 3)){
