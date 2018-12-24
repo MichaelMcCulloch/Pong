@@ -118,16 +118,20 @@ int Renderer::prepareShaders() {
     //prepare the shaders
     char *vertexSource = (char *)
             "#version 320 es                        \n"
-            "layout(location=0) in vec3 position;   \n"
+            "in vec2 vPosition;                     \n"
+            "in vec3 vColor;                        \n"
+            "out vec3 fCol;                         \n"
             "void main(){                           \n"
-            "    gl_Position=vec4(position, 1.0);   \n"
+            "    gl_Position=vec4(vPosition, 0.0, 1.0);   \n"
+            "    fCol=vColor;                       \n"
             "}";
     char *fragmentSource = (char *)
             "#version 320 es                            \n"
             "precision mediump float;                   \n"
+            "in vec3 fCol;                          \n"
             "out vec4 color;                            \n"
             "void main() {                              \n"
-            "  color = vec4(1.0, 1.0, 1.0, 1.0); \n"
+            "  color = vec4(fCol, 1.0);                        \n"
             "}                                          \n";
 
 
@@ -162,34 +166,29 @@ void Renderer::drawFrame(int x, int y, float angle) {
             glm::vec2(1, -sqrt(3) / 2),
             glm::vec2(0, sqrt(3) / 2)
     };
-    /*
+
     std::vector<glm::vec3> col = {
             glm::vec3(1, 0, 0),
             glm::vec3(0, 1, 0),
             glm::vec3(0, 0, 1)
     };
 
+
     Geometry triangle;
     if (!InitializeVAO(&triangle)) {
         LOGW("FAILED TO INITIALIZE TRIANGLE");
         return;
     }
-
     if (!LoadGeometry(&triangle, pts.data(), col.data(), 3)){
-        LOGW("Failed to load geometry");
-        return;
-    }
+        LOGW("RENDERER: FAILED TO LOAD GEOMETRY");
+    };
 
-    */
-    GLfloat vVertices[] = {0.0f,  0.5f, 0.0f,
-                           -0.5f, -0.5f, 0.0f,
-                           0.5f, -0.5f,  0.0f};
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(shader);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*4, vVertices);
-    glEnableVertexAttribArray(0);
+    glBindVertexArray(triangle.vertexArray);
+
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
     glBindVertexArray(0);

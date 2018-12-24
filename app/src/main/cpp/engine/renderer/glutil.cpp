@@ -4,26 +4,27 @@
 bool CheckGLErrors() {
     bool error = false;
     for (GLenum flag = glGetError(); flag != GL_NO_ERROR; flag = glGetError()) {
-        LOGW("OpenGL ERROR:");
+        char * errCode;
         switch (flag) {
             case GL_INVALID_ENUM:
-                LOGW("GL_INVALID_ENUM");
+                errCode = (char *)"GL_INVALID_ENUM";
                 break;
             case GL_INVALID_VALUE:
-                LOGW("GL_INVALID_VALUE");
+                errCode = (char *)"GL_INVALID_VALUE";
                 break;
             case GL_INVALID_OPERATION:
-                LOGW("GL_INVALID_OPERATION");
+                errCode = (char *)"GL_INVALID_OPERATION";
                 break;
             case GL_INVALID_FRAMEBUFFER_OPERATION:
-                LOGW("GL_INVALID_FRAMEBUFFER_OPERATION");
+                errCode = (char *)"GL_INVALID_FRAMEBUFFER_OPERATION";
                 break;
             case GL_OUT_OF_MEMORY:
-                LOGW("GL_OUT_OF_MEMORY");
+                errCode = (char *)"GL_OUT_OF_MEMORY";
                 break;
             default:
-                LOGW("[unknown error code]");
+                errCode = (char *)"[unknown error code]";
         }
+        LOGW("OpenGLES Error: %s", errCode);
         error = true;
     }
     return error;
