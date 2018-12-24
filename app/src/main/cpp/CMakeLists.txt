@@ -20,6 +20,8 @@ target_include_directories(native-activity
         PRIVATE
         ${ANDROID_NDK}/sources/android/native_app_glue)
 
+#Build the library
+
 foreach(TARGET
         message_bus
         renderer)

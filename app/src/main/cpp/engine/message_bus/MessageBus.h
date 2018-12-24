@@ -5,14 +5,18 @@
 #include <queue>
 #include <vector>
 
+enum MessageType{
+    MT_Startup,
+    MT_Shutdown,
+    MT_HELLO
+};
 class Message {
 public:
-    Message(const std::string event);
-
-    std::string getEvent();
+    Message(const MessageType mt);
+    MessageType getEvent();
 
 private:
-    std::string messageEvent;
+    MessageType messageType;
 };
 
 class MessageBus {

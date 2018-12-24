@@ -150,10 +150,33 @@ void Renderer::drawFrame(int x, int y, float angle) {
         return;
     }
 
+    //Create Triangle
+    std::vector<glm::vec2> pts = {
+            glm::vec2(-1, -sqrt(3) / 2),
+            glm::vec2(1, -sqrt(3) / 2),
+            glm::vec2(0, sqrt(3) / 2)
+    };
+    std::vector<glm::vec3> col = {
+            glm::vec3(1, 0, 0),
+            glm::vec3(0, 1, 0),
+            glm::vec3(0, 0, 1)
+    };
 
-    glClearColor(((float) x /width), angle,
-                 ((float) y/height), 1);
+    Geometry triangle;
+    if (!InitializeVAO(&triangle)) {
+        LOGW("FAILED TO INITIALIZE TRIANGLE");
+        return;
+    }
+
+    if (!LoadGeometry(&triangle, pts.data(), col.data(), 3)){
+        LOGW("Failed to load geometry");
+        return;
+    }
+
+    glUseProgram(shader);
+    glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 
     eglSwapBuffers(display, surface);
 
@@ -179,6 +202,7 @@ void Renderer::term_display() {
     context = EGL_NO_CONTEXT;
     surface = EGL_NO_SURFACE;
 }
+
 
 void Renderer::onNotify(Message message) {
     BusNode::onNotify(message);

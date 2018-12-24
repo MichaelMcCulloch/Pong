@@ -11,7 +11,8 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++17 -frtti -fexceptions"
+
+                cppFlags "-std=c++17 -frtti -fexceptions -DANDROID_STL=c++_static"
             }
         }
         shaders {

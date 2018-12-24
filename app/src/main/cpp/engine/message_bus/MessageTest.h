@@ -3,6 +3,7 @@
 //
 
 #include "gtest/gtest.h"
+
 #include "MessageBus.h"
 
 //Not really a test
@@ -11,7 +12,9 @@ TEST(MessageA, B) {
     //receive from ComponentB
     class ComponentA : public BusNode {
     public:
-        ComponentA(MessageBus *messageBus) : BusNode(messageBus) {}
+        ComponentA(MessageBus *messageBus) : BusNode() {
+            startUp(messageBus);
+        }
 
     private:
         void onNotify(Message message) {
@@ -22,10 +25,12 @@ TEST(MessageA, B) {
     //Send to ComponentA
     class ComponentB : public BusNode {
     public:
-        ComponentB(MessageBus *messageBus) : BusNode(messageBus) {}
+        ComponentB(MessageBus *messageBus) : BusNode() {
+            startUp(messageBus);
+        }
 
         void update() {
-            Message greeting("hi");
+            Message greeting(MT_HELLO);
             send(greeting);
         }
 

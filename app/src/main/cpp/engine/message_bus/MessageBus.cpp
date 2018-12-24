@@ -1,11 +1,11 @@
 #include "MessageBus.h"
 
-Message::Message(const std::string event) {
-    messageEvent = event;
+Message::Message(const MessageType mt) {
+    messageType = mt;
 }
 
-std::string Message::getEvent() {
-    return messageEvent;
+MessageType Message::getEvent() {
+    return messageType;
 }
 
 void MessageBus::addReceiver(std::function<void(Message)> messageReceiver) {
