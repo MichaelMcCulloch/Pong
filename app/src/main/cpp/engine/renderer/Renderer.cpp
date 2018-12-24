@@ -6,19 +6,19 @@
 void Renderer::startUp(ANativeWindow *window, MessageBus* m) {
     BusNode::startUp(m);
 
-    if (init_display(window)) return;
+    if (initDisplay(window)) return;
     if (prepareOpenGL()) return;
     if (prepareShaders()) return;
 }
 
 void Renderer::shutDown() {
-    term_display();
+    termDisplay();
 }
 
 /**
  * Initialize an EGL context for the current display.
  */
-int Renderer::init_display(ANativeWindow *window) {
+int Renderer::initDisplay(ANativeWindow *window) {
     // initialize OpenGL ES and EGL
 
     /*
@@ -31,6 +31,7 @@ int Renderer::init_display(ANativeWindow *window) {
             EGL_BLUE_SIZE, 8,
             EGL_GREEN_SIZE, 8,
             EGL_RED_SIZE, 8,
+            EGL_CONTEXT_CLIENT_VERSION, 2,
             EGL_NONE
     };
     EGLint w, h, format;
@@ -77,6 +78,7 @@ int Renderer::init_display(ANativeWindow *window) {
     surf = eglCreateWindowSurface(disp, config, window, NULL);
     cntxt = eglCreateContext(disp, config, NULL, NULL);
 
+
     if (eglMakeCurrent(disp, surf, surf, cntxt) == EGL_FALSE) {
         LOGW("Unable to eglMakeCurrent");
         return -1;
@@ -112,16 +114,17 @@ int Renderer::prepareOpenGL() {
 int Renderer::prepareShaders() {
     //prepare the shaders
     char *vertexSource = (char *)
-            "attribute vec4 vPosition;   \n"
-            "void main()                 \n"
-            "{"
-            "    gl_Position=vPosition;  \n"
+            "#version 320 es                        \n"
+            "layout(location=0) in vec3 position;   \n"
+            "void main(){                           \n"
+            "    gl_Position=vec4(position, 1.0);   \n"
             "}";
     char *fragmentSource = (char *)
+            "#version 320 es                            \n"
             "precision mediump float;                   \n"
-            "void main()                                \n"
-            "{                                          \n"
-            "  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0); \n"
+            "out vec4 color;                            \n"
+            "void main() {                              \n"
+            "  color = vec4(1.0, 1.0, 1.0, 1.0); \n"
             "}                                          \n";
 
 
@@ -156,6 +159,7 @@ void Renderer::drawFrame(int x, int y, float angle) {
             glm::vec2(1, -sqrt(3) / 2),
             glm::vec2(0, sqrt(3) / 2)
     };
+    /*
     std::vector<glm::vec3> col = {
             glm::vec3(1, 0, 0),
             glm::vec3(0, 1, 0),
@@ -173,20 +177,32 @@ void Renderer::drawFrame(int x, int y, float angle) {
         return;
     }
 
-    glUseProgram(shader);
+    */
+    GLfloat vVertices[] = {0.0f,  0.5f, 0.0f,
+                           -0.5f, -0.5f, 0.0f,
+                           0.5f, -0.5f,  0.0f};
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    glUseProgram(shader);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*4, vVertices);
+    glEnableVertexAttribArray(0);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 
+    glBindVertexArray(0);
+    glUseProgram(0);
+
     eglSwapBuffers(display, surface);
+
+    CheckGLErrors();
 
 }
 
 /**
  * Tear down the EGL context currently associated with the display.
- * TODO: Make use of the message bus to brodcast the trigger.
+ * TODO: Make use of the message bus to broadcast the trigger.
  */
-void Renderer::term_display() {
+void Renderer::termDisplay() {
     if (display != EGL_NO_DISPLAY) {
         eglMakeCurrent(display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
         if (context != EGL_NO_CONTEXT) {

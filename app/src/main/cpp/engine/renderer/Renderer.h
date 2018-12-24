@@ -20,7 +20,7 @@ public:
 
     void shutDown();
 
-    int init_display(ANativeWindow*);
+    int initDisplay(ANativeWindow *);
 
     void drawFrame(int, int, float);
 
@@ -33,7 +33,7 @@ private:
     int32_t width;
     int32_t height;
 
-    void term_display();
+    void termDisplay();
 
     int prepareOpenGL();
 
