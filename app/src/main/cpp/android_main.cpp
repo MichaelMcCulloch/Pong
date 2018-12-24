@@ -39,8 +39,6 @@
 #ifdef TESTING
 
 #include "gtest/gtest.h"
-#include "MessageTest.h"
-#include "RendererTest.h"
 
 #endif
 
