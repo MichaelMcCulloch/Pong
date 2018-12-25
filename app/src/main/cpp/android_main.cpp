@@ -20,21 +20,16 @@
 #include <memory>
 #include <cstdlib>
 #include <cstring>
-#include <jni.h>
-#include <errno.h>
+#include <cstdlib>
+#include <cstring>
 #include <cassert>
 
-#include <android/sensor.h>
-#include <android/log.h>
-#include <android_native_app_glue.h>
 
+#include "common.hpp"
 #include "MessageBus.h"
 #include "Renderer.h"
 
-//#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "native-activity", __VA_ARGS__))
-//#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "native-activity", __VA_ARGS__))
-
-#define TESTING
+//#define TESTING
 
 #ifdef TESTING
 
@@ -79,7 +74,7 @@ static int32_t engine_handle_input(struct android_app *app, AInputEvent *event) 
         engine->animating = 1;
         engine->state.x = (int32_t)AMotionEvent_getX(event, 0);
         engine->state.y = (int32_t)AMotionEvent_getY(event, 0);
-        LOGI("input: x=%d y=%d", engine->state.x, engine->state.y);
+        LOGI("native_activity: input: x=%d y=%d", engine->state.x, engine->state.y);
         return 1;
     }
     return 0;
@@ -92,12 +87,14 @@ static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
     struct engine *engine = (struct engine *) app->userData;
     switch (cmd) {
         case APP_CMD_SAVE_STATE:
+            LOGI("native_activity: received APP_CMD_SAVE_STATE");
             // The system has asked us to save our current state.  Do so.
             engine->app->savedState = malloc(sizeof(struct saved_state));
             *((struct saved_state *) engine->app->savedState) = engine->state;
             engine->app->savedStateSize = sizeof(struct saved_state);
             break;
         case APP_CMD_INIT_WINDOW:
+            LOGI("native_activity: received APP_CMD_INIT_WINDOW");
             // The window is being shown, get it ready.
             if (engine->app->window != NULL) {
                 engine->renderer->startUp(app->window,engine->messageBus);
@@ -105,10 +102,12 @@ static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
             }
             break;
         case APP_CMD_TERM_WINDOW:
+            LOGI("native_activity: received APP_CMD_TERM_WINDOW");
             // The window is being hidden or closed, clean it up.
             engine->renderer->shutDown();
             break;
         case APP_CMD_GAINED_FOCUS:
+            LOGI("native_activity: received APP_CMD_GAINED_FOCUS");
             // When our app gains focus, we start monitoring the accelerometer.
             if (engine->accelerometerSensor != NULL) {
                 ASensorEventQueue_enableSensor(engine->sensorEventQueue,
@@ -120,6 +119,7 @@ static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
             }
             break;
         case APP_CMD_LOST_FOCUS:
+            LOGI("native_activity: received APP_CMD_LOST_FOCUS");
             // When our app loses focus, we stop monitoring the accelerometer.
             // This is to avoid consuming battery while not being used.
             if (engine->accelerometerSensor != NULL) {
@@ -251,7 +251,7 @@ void android_main(struct android_app* state) {
                     ASensorEvent event;
                     while (ASensorEventQueue_getEvents(engine.sensorEventQueue,
                                                        &event, 1) > 0) {
-                        LOGI("accelerometer: x=%f y=%f z=%f",
+                        LOGV("native_activity: accelerometer: x=%f y=%f z=%f",
                              event.acceleration.x, event.acceleration.y,
                              event.acceleration.z);
                     }

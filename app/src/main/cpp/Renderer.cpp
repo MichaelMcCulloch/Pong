@@ -4,6 +4,7 @@
 
 //TODO: throw errors and quit.
 void Renderer::startUp(ANativeWindow *window, MessageBus* m) {
+    LOGI("renderer: startUp");
     BusNode::startUp(m);
 
     if (initDisplay(window)) return;
@@ -12,6 +13,7 @@ void Renderer::startUp(ANativeWindow *window, MessageBus* m) {
 }
 
 void Renderer::shutDown() {
+    LOGI("renderer: shutDown");
     termDisplay();
 }
 
@@ -19,6 +21,7 @@ void Renderer::shutDown() {
  * Initialize an EGL context for the current display.
  */
 int Renderer::initDisplay(ANativeWindow *window) {
+    LOGI("renderer: initDisplay");
     // initialize OpenGL ES and EGL
 
     /*
@@ -152,7 +155,7 @@ int Renderer::prepareShaders() {
  * Just the current frame in the display.
  */
 void Renderer::drawFrame(int x, int y, float angle) {
-
+    LOGV("renderer: drawFrame");
 
      // TODO: draw a triangle which follows touch
     if (display == NULL) {
@@ -181,11 +184,11 @@ void Renderer::drawFrame(int x, int y, float angle) {
 
     Geometry triangle;
     if (!InitializeVAO(&triangle)){
-        LOGW("RENDERER: FAILED TO INITIALIZE VAO");
+        LOGW("renderer: failed to initialize VAO");
         return;
     }
     if (!LoadGeometry(&triangle, pts.data(), col.data(), 3)){
-        LOGW("RENDERER: FAILED TO LOAD GEOMETRY");
+        LOGW("renderer: failed to load geometry");
     };
 
     glClearColor(0, 0, 0, 1);
@@ -228,6 +231,7 @@ void Renderer::termDisplay() {
 
 
 void Renderer::onNotify(Message message) {
+    LOGV("renderer: received %s", (char *)message.getEvent());
     BusNode::onNotify(message);
 }
 
