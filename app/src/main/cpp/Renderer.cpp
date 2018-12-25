@@ -4,7 +4,7 @@
 
 //TODO: throw errors and quit.
 void Renderer::startUp(ANativeWindow *window, MessageBus* m) {
-    LOGI("renderer: startUp");
+    LOGI("Renderer: startUp");
     BusNode::startUp(m);
 
     if (initDisplay(window)) return;
@@ -13,7 +13,7 @@ void Renderer::startUp(ANativeWindow *window, MessageBus* m) {
 }
 
 void Renderer::shutDown() {
-    LOGI("renderer: shutDown");
+    LOGI("Renderer: shutDown");
     termDisplay();
 }
 
@@ -21,7 +21,7 @@ void Renderer::shutDown() {
  * Initialize an EGL context for the current display.
  */
 int Renderer::initDisplay(ANativeWindow *window) {
-    LOGI("renderer: initDisplay");
+    LOGI("Renderer: initDisplay");
     // initialize OpenGL ES and EGL
 
     /*
@@ -86,7 +86,7 @@ int Renderer::initDisplay(ANativeWindow *window) {
 
 
     if (eglMakeCurrent(disp, surf, surf, cntxt) == EGL_FALSE) {
-        LOGW("Unable to eglMakeCurrent");
+        LOGW("Renderer: Unable to eglMakeCurrent");
         return -1;
     }
 
@@ -108,7 +108,7 @@ int Renderer::prepareOpenGL() {
     auto opengl_info = {GL_VENDOR, GL_RENDERER, GL_VERSION, GL_EXTENSIONS};
     for (auto name : opengl_info) {
         auto info = glGetString(name);
-        LOGI("OpenGL Info: %s", info);
+        LOGI("Renderer: OpenGL Info: %s", info);
     }
     // Initialize GL state.
     glEnable(GL_CULL_FACE);
@@ -155,7 +155,7 @@ int Renderer::prepareShaders() {
  * Just the current frame in the display.
  */
 void Renderer::drawFrame(int x, int y, float angle) {
-    LOGV("renderer: drawFrame");
+    LOGV("Renderer: drawFrame");
 
      // TODO: draw a triangle which follows touch
     if (display == NULL) {
@@ -184,11 +184,11 @@ void Renderer::drawFrame(int x, int y, float angle) {
 
     Geometry triangle;
     if (!InitializeVAO(&triangle)){
-        LOGW("renderer: failed to initialize VAO");
+        LOGW("Renderer: failed to initialize VAO");
         return;
     }
     if (!LoadGeometry(&triangle, pts.data(), col.data(), 3)){
-        LOGW("renderer: failed to load geometry");
+        LOGW("Renderer: failed to load geometry");
     };
 
     glClearColor(0, 0, 0, 1);
@@ -231,7 +231,7 @@ void Renderer::termDisplay() {
 
 
 void Renderer::onNotify(Message message) {
-    LOGV("renderer: received %s", (char *)message.getEvent());
+    LOGV("Renderer: received %s", (char *)message.getEvent());
     BusNode::onNotify(message);
 }
 

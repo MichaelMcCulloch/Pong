@@ -74,7 +74,7 @@ static int32_t engine_handle_input(struct android_app *app, AInputEvent *event) 
         engine->animating = 1;
         engine->state.x = (int32_t)AMotionEvent_getX(event, 0);
         engine->state.y = (int32_t)AMotionEvent_getY(event, 0);
-        LOGI("native_activity: input: x=%d y=%d", engine->state.x, engine->state.y);
+        LOGV("Engine: input: x=%d y=%d", engine->state.x, engine->state.y);
         return 1;
     }
     return 0;
@@ -87,14 +87,14 @@ static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
     struct engine *engine = (struct engine *) app->userData;
     switch (cmd) {
         case APP_CMD_SAVE_STATE:
-            LOGI("native_activity: received APP_CMD_SAVE_STATE");
+            LOGV("Engine: received APP_CMD_SAVE_STATE");
             // The system has asked us to save our current state.  Do so.
             engine->app->savedState = malloc(sizeof(struct saved_state));
             *((struct saved_state *) engine->app->savedState) = engine->state;
             engine->app->savedStateSize = sizeof(struct saved_state);
             break;
         case APP_CMD_INIT_WINDOW:
-            LOGI("native_activity: received APP_CMD_INIT_WINDOW");
+            LOGV("Engine: received APP_CMD_INIT_WINDOW");
             // The window is being shown, get it ready.
             if (engine->app->window != NULL) {
                 engine->renderer->startUp(app->window,engine->messageBus);
@@ -102,12 +102,12 @@ static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
             }
             break;
         case APP_CMD_TERM_WINDOW:
-            LOGI("native_activity: received APP_CMD_TERM_WINDOW");
+            LOGV("Engine: received APP_CMD_TERM_WINDOW");
             // The window is being hidden or closed, clean it up.
             engine->renderer->shutDown();
             break;
         case APP_CMD_GAINED_FOCUS:
-            LOGI("native_activity: received APP_CMD_GAINED_FOCUS");
+            LOGV("Engine: received APP_CMD_GAINED_FOCUS");
             // When our app gains focus, we start monitoring the accelerometer.
             if (engine->accelerometerSensor != NULL) {
                 ASensorEventQueue_enableSensor(engine->sensorEventQueue,
@@ -119,7 +119,7 @@ static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
             }
             break;
         case APP_CMD_LOST_FOCUS:
-            LOGI("native_activity: received APP_CMD_LOST_FOCUS");
+            LOGV("Engine: received APP_CMD_LOST_FOCUS");
             // When our app loses focus, we stop monitoring the accelerometer.
             // This is to avoid consuming battery while not being used.
             if (engine->accelerometerSensor != NULL) {
@@ -129,6 +129,33 @@ static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
             // Also stop animating.
             engine->animating = 0;
             engine->renderer->drawFrame(engine->state.x, engine->state.y, engine->state.angle);
+            break;
+        case APP_CMD_PAUSE:
+            LOGV("Engine: APP_CMD_PAUSE");
+            break;
+        case APP_CMD_RESUME:
+            LOGV("Engine: APP_CMD_RESUME");
+            break;
+        case APP_CMD_STOP:
+            LOGV("Engine: APP_CMD_STOP");
+            break;
+        case APP_CMD_START:
+            LOGV("Engine: APP_CMD_START");
+            break;
+        case APP_CMD_WINDOW_RESIZED:
+        case APP_CMD_CONFIG_CHANGED:
+            LOGV("Engine: %s", cmd == APP_CMD_WINDOW_RESIZED ?
+                                              "APP_CMD_WINDOW_RESIZED" : "APP_CMD_CONFIG_CHANGED");
+            // Window was resized or some other configuration changed.
+            // Note: we don't handle this event because we check the surface dimensions
+            // every frame, so that's how we know it was resized. If you are NOT doing that,
+            // then you need to handle this event!
+            break;
+        case APP_CMD_LOW_MEMORY:
+            LOGV("Engine: APP_CMD_LOW_MEMORY");
+            break;
+        default:
+            LOGV("Engine: (unknown command).");
             break;
     }
 }
@@ -251,7 +278,7 @@ void android_main(struct android_app* state) {
                     ASensorEvent event;
                     while (ASensorEventQueue_getEvents(engine.sensorEventQueue,
                                                        &event, 1) > 0) {
-                        LOGV("native_activity: accelerometer: x=%f y=%f z=%f",
+                        LOGV("Main: accelerometer: x=%f y=%f z=%f",
                              event.acceleration.x, event.acceleration.y,
                              event.acceleration.z);
                     }

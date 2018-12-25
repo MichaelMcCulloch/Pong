@@ -2,8 +2,6 @@
 
 #include <iostream>
 #include <vector>
-#include <android/log.h>
-
 
 #include "glutil.h"
 #include "MessageBus.h"
