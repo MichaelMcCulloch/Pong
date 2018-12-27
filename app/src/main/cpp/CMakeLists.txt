@@ -30,6 +30,7 @@ add_subdirectory(glm)
 add_library(native-activity SHARED
         android_main.cpp
         glutil.cpp
+        Engine.cpp
         MessageBus.cpp
         Renderer.cpp)
 

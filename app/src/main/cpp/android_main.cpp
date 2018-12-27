@@ -29,12 +29,10 @@
 #include "MessageBus.h"
 #include "Renderer.h"
 
-//#define TESTING
+#define TESTING 0
 
-#ifdef TESTING
-
-#include "gtest/gtest.h"
-
+#if TESTING
+    #include "gtest/gtest.h"
 #endif
 
 /**
@@ -120,13 +118,13 @@ static void engine_handle_cmd(struct android_app *app, int32_t cmd) {
             break;
         case APP_CMD_LOST_FOCUS:
             LOGV("Engine: received APP_CMD_LOST_FOCUS");
-            // When our app loses focus, we stop monitoring the accelerometer.
+            // When our app loses focus, we shutDown monitoring the accelerometer.
             // This is to avoid consuming battery while not being used.
             if (engine->accelerometerSensor != NULL) {
                 ASensorEventQueue_disableSensor(engine->sensorEventQueue,
                                                 engine->accelerometerSensor);
             }
-            // Also stop animating.
+            // Also shutDown animating.
             engine->animating = 0;
             engine->renderer->drawFrame(engine->state.x, engine->state.y, engine->state.angle);
             break;
@@ -215,15 +213,15 @@ ASensorManager *AcquireASensorManagerInstance(android_app *app) {
  */
 void android_main(struct android_app* state) {
 
-#ifdef TESTING
+    #if TESTING
     int argc = 1;
 
     char *name = (char *) "Testing";
     char **argv = &name;
     ::testing::InitGoogleTest(&argc, argv);
     if (RUN_ALL_TESTS()) return;
+    #endif
 
-#endif
     //TODO: Initialize MessageBus, renderer
 
 
