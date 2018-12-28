@@ -7,6 +7,7 @@
 void Engine::startUp() {
     memset(&gamestate, 0, sizeof(gamestate));
     memset(&engine, 0, sizeof(engine));
+    A CHANGE
 }
 
 void Engine::shutDown() {
