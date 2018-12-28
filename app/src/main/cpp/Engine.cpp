@@ -100,25 +100,10 @@ void Engine::handleCommand(int32_t cmd) {
             // The window is being hidden or closed, clean it up.
             renderer->shutDown();
             break;
-        case APP_CMD_GAINED_FOCUS:
-            LOGV("Engine: received APP_CMD_GAINED_FOCUS");
-            break;
         case APP_CMD_LOST_FOCUS:
             LOGV("Engine: received APP_CMD_LOST_FOCUS");
 
             renderer->drawFrame(gamestate.x, gamestate.y, gamestate.angle);
-            break;
-        case APP_CMD_PAUSE:
-            LOGV("Engine: APP_CMD_PAUSE");
-            break;
-        case APP_CMD_RESUME:
-            LOGV("Engine: APP_CMD_RESUME");
-            break;
-        case APP_CMD_STOP:
-            LOGV("Engine: APP_CMD_STOP");
-            break;
-        case APP_CMD_START:
-            LOGV("Engine: APP_CMD_START");
             break;
         case APP_CMD_WINDOW_RESIZED:
         case APP_CMD_CONFIG_CHANGED:
@@ -127,13 +112,10 @@ void Engine::handleCommand(int32_t cmd) {
             // Window was resized or some other configuration changed.
             // Note: we don't handle this event because we check the surface dimensions
             // every frame, so that's how we know it was resized. If you are NOT doing that,
-            // then you need to handle this event!
-            break;
-        case APP_CMD_LOW_MEMORY:
-            LOGV("Engine: APP_CMD_LOW_MEMORY");
+            // then TODO: you need to handle this event!
             break;
         default:
-            LOGV("Engine: (unknown command).");
+            LOGV("Engine: (unused command).");
             break;
     }
 }
