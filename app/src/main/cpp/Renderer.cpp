@@ -15,6 +15,7 @@ void Renderer::startUp(ANativeWindow *window, MessageBus* m) {
 void Renderer::shutDown() {
     LOGI("Renderer: shutDown");
     termDisplay();
+    BusNode::shutdown();
 }
 
 /**
@@ -237,6 +238,13 @@ void Renderer::onNotify(Message message) {
             break;
         case _Y_DISPLACEMENT:
             yDisplacement = *(int32_t *)message.data;
+            break;
+        case _APP_CMD_WINDOW_RESIZED:
+        case _APP_CMD_CONFIG_CHANGED:
+            // Window was resized or some other configuration changed.
+            // Note: we don't handle this event because we check the surface dimensions
+            // every frame, so that's how we know it was resized. If you are NOT doing that,
+            // then TODO: you need to handle this event!
             break;
         default:
             break;

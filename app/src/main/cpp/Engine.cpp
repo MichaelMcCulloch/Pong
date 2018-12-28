@@ -109,12 +109,9 @@ void Engine::handleCommand(int32_t cmd) {
             break;
         case APP_CMD_WINDOW_RESIZED:
             messageBus->postMessage(_APP_CMD_WINDOW_RESIZED, NULL);
+            break;
         case APP_CMD_CONFIG_CHANGED:
             messageBus->postMessage(_APP_CMD_CONFIG_CHANGED, NULL);
-            // Window was resized or some other configuration changed.
-            // Note: we don't handle this event because we check the surface dimensions
-            // every frame, so that's how we know it was resized. If you are NOT doing that,
-            // then TODO: you need to handle this event!
             break;
         default:
             LOGV("Engine: (unused command).");
@@ -129,9 +126,7 @@ void Engine::startUp(struct android_app * state) {
     messageBus = new MessageBus();
     renderer = new Renderer();
 
-    mApp->userData = this;
-    state->onAppCmd = _handleCmdProxy;
-    state->onInputEvent = _handleInputProxy;
+
 
 
     if (state->savedState != NULL) {
@@ -143,6 +138,10 @@ void Engine::startUp(struct android_app * state) {
 
 void Engine::gameLoop(){
 
+    //engine subsystems cannot accept commands before they startUp();
+    mApp->userData = this;
+    mApp->onAppCmd = _handleCmdProxy;
+    mApp->onInputEvent = _handleInputProxy;
 
     // loop waiting for stuff to do.
     while (1) {
