@@ -1,11 +1,26 @@
 #include "MessageBus.h"
 
-Message::Message(const MessageType mt) {
-    messageType = mt;
-}
-
-MessageType Message::getEvent() {
-    return messageType;
+char* messageTypeToString(MessageType mt){
+    switch(mt) {
+        case _APP_CMD_SAVE_STATE:
+            return (char *) "_APP_CMD_SAVE_STATE";
+        case _APP_CMD_INIT_WINDOW:
+            return (char *) "_APP_CMD_INIT_WINDOW";
+        case _APP_CMD_TERM_WINDOW:
+            return (char *) "_APP_CMD_TERM_WINDOW";
+        case _APP_CMD_LOST_FOCUS:
+            return (char *) "_APP_CMD_LOST_FOCUS";
+        case _APP_CMD_WINDOW_RESIZED:
+            return (char *) "_APP_CMD_WINDOW_RESIZED";
+        case _APP_CMD_CONFIG_CHANGED:
+            return (char *) "_APP_CMD_CONFIG_CHANGED";
+        case _X_DISPLACEMENT:
+            return (char *) "_X_DISPLACEMENT";
+        case _Y_DISPLACEMENT:
+            return (char *) "_Y_DISPLACEMENT";
+        default:
+            return (char *) "UNKNOWN";
+    }
 }
 
 void MessageBus::addReceiver(std::function<void(Message)> messageReceiver) {
@@ -13,7 +28,17 @@ void MessageBus::addReceiver(std::function<void(Message)> messageReceiver) {
 }
 
 void MessageBus::sendMessage(Message message) {
+
+    LOGV("MsgBus : Received %s", messageTypeToString(message.messageType));
     messages.push(message);
+}
+
+void MessageBus::postMessage(MessageType messageType, void * data){
+    struct Message msg = {
+            messageType,
+            data
+    };
+    sendMessage(msg);
 }
 
 void MessageBus::notify() {
@@ -39,10 +64,7 @@ void BusNode::send(Message message) {
     messageBus->sendMessage(message);
 }
 
-void BusNode::onNotify(Message message) {
-    // Do something here. Your choice. But you could do this.
-    // std::cout << "Siopao! Siopao! Siopao! (Someone forgot to implement onNotify().)" << std::endl;
-}
+
 
 void BusNode::startUp(MessageBus *messageBus) {
     this->messageBus = messageBus;

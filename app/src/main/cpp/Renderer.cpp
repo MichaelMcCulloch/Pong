@@ -154,7 +154,7 @@ int Renderer::prepareShaders() {
 /**
  * Just the current frame in the display.
  */
-void Renderer::drawFrame(int x, int y, float angle) {
+void Renderer::drawFrame() {
     LOGV("Renderer: drawFrame");
 
      // TODO: draw a triangle which follows touch
@@ -163,8 +163,8 @@ void Renderer::drawFrame(int x, int y, float angle) {
         return;
     }
 
-    float xOff = (float)x / (float)width;
-    float yOff = (float)y / (float)height;
+    float xOff = (float)xDisplacement / (float)width;
+    float yOff = (float)yDisplacement / (float)height;
     glm::vec2 fingerIsAt = glm::vec2((xOff * 2) -1, -(yOff*2) +1);
 
     //Create Triangle
@@ -231,8 +231,16 @@ void Renderer::termDisplay() {
 
 
 void Renderer::onNotify(Message message) {
-    LOGV("Renderer: received %s", (char *)message.getEvent());
-    BusNode::onNotify(message);
+    switch (message.messageType){
+        case _X_DISPLACEMENT:
+            xDisplacement = *(int32_t *)message.data;
+            break;
+        case _Y_DISPLACEMENT:
+            yDisplacement = *(int32_t *)message.data;
+            break;
+        default:
+            break;
+    }
 }
 
 

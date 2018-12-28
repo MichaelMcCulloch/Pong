@@ -5,32 +5,40 @@
 #include <queue>
 #include <vector>
 
-enum MessageType{
-    MT_Startup,
-    MT_Shutdown,
-    MT_HELLO
-};
-class Message {
-public:
-    Message(const MessageType mt);
-    MessageType getEvent();
+#include "common.hpp"
 
-private:
-    MessageType messageType;
+enum MessageType{
+    _APP_CMD_SAVE_STATE,
+    _APP_CMD_INIT_WINDOW,
+    _APP_CMD_TERM_WINDOW,
+    _APP_CMD_LOST_FOCUS,
+    _APP_CMD_WINDOW_RESIZED,
+    _APP_CMD_CONFIG_CHANGED,
+    _X_DISPLACEMENT,
+    _Y_DISPLACEMENT
 };
+
+char* messageTypeToString(MessageType mt);
+
+struct Message {
+    MessageType messageType;
+    void * data;
+};
+
 
 class MessageBus {
 public:
     MessageBus() {};
     ~MessageBus() {};
 
-    void addReceiver(std::function<void(Message)> messageReceiver);
-    void sendMessage(Message message);
+    void addReceiver(std::function<void(struct Message)> messageReceiver);
+    void sendMessage(struct Message message);
+    void postMessage(MessageType, void*);
     void notify();
 
 private:
-    std::vector<std::function<void(Message)>> receivers;
-    std::queue<Message> messages;
+    std::vector<std::function<void(struct Message)>> receivers;
+    std::queue<struct Message> messages;
 };
 
 class BusNode {
@@ -46,5 +54,5 @@ protected:
 
     void send(Message message);
 
-    virtual void onNotify(Message message);
+    virtual void onNotify(Message message) = 0;
 };

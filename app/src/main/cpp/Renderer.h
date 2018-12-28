@@ -17,7 +17,7 @@ public:
 
     int initDisplay(ANativeWindow *);
 
-    void drawFrame(int, int, float);
+    void drawFrame();
 
 private:
 
@@ -27,6 +27,8 @@ private:
     GLuint shader;
     int32_t width;
     int32_t height;
+
+    int xDisplacement = 0, yDisplacement = 0;
 
     void termDisplay();
 

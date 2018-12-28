@@ -69,7 +69,9 @@ int32_t Engine::handleEvent(AInputEvent *event) {
         animating = 1;
         gamestate.x = (int32_t)AMotionEvent_getX(event, 0);
         gamestate.y = (int32_t)AMotionEvent_getY(event, 0);
-        LOGV("Engine: input: x=%d y=%d", gamestate.x, gamestate.y);
+
+        messageBus->postMessage(_X_DISPLACEMENT, (void *) &gamestate.x);
+        messageBus->postMessage(_Y_DISPLACEMENT, (void *) &gamestate.y);
         return 1;
     }
     return 0;
@@ -81,34 +83,34 @@ int32_t Engine::handleEvent(AInputEvent *event) {
 void Engine::handleCommand(int32_t cmd) {
     switch (cmd) {
         case APP_CMD_SAVE_STATE:
-            LOGV("Engine: received APP_CMD_SAVE_STATE");
+            messageBus->postMessage(_APP_CMD_SAVE_STATE, NULL);
             // The system has asked us to save our current state.  Do so.
             mApp->savedState = malloc(sizeof(struct gamestate));
             *(struct gamestate *) mApp->savedState = gamestate;
             mApp->savedStateSize = sizeof(struct gamestate);
             break;
         case APP_CMD_INIT_WINDOW:
-            LOGV("Engine: received APP_CMD_INIT_WINDOW");
+            messageBus->postMessage(_APP_CMD_INIT_WINDOW,  NULL);
             // The window is being shown, get it ready.
             if (mApp->window != NULL) {
                 renderer->startUp(mApp->window,messageBus);
-                renderer->drawFrame(gamestate.x, gamestate.y, gamestate.angle);
+                renderer->drawFrame();
             }
             break;
         case APP_CMD_TERM_WINDOW:
-            LOGV("Engine: received APP_CMD_TERM_WINDOW");
+            messageBus->postMessage(_APP_CMD_TERM_WINDOW, NULL);
             // The window is being hidden or closed, clean it up.
             renderer->shutDown();
             break;
         case APP_CMD_LOST_FOCUS:
-            LOGV("Engine: received APP_CMD_LOST_FOCUS");
-
-            renderer->drawFrame(gamestate.x, gamestate.y, gamestate.angle);
+            messageBus->postMessage(_APP_CMD_LOST_FOCUS, NULL);
+            animating = 0;
+            renderer->drawFrame();
             break;
         case APP_CMD_WINDOW_RESIZED:
+            messageBus->postMessage(_APP_CMD_WINDOW_RESIZED, NULL);
         case APP_CMD_CONFIG_CHANGED:
-            LOGV("Engine: %s", cmd == APP_CMD_WINDOW_RESIZED ?
-                               "APP_CMD_WINDOW_RESIZED" : "APP_CMD_CONFIG_CHANGED");
+            messageBus->postMessage(_APP_CMD_CONFIG_CHANGED, NULL);
             // Window was resized or some other configuration changed.
             // Note: we don't handle this event because we check the surface dimensions
             // every frame, so that's how we know it was resized. If you are NOT doing that,
@@ -122,6 +124,7 @@ void Engine::handleCommand(int32_t cmd) {
 
 void Engine::startUp(struct android_app * state) {
     mApp = state;
+    memset(&gamestate, 0, sizeof(struct gamestate));
 
     messageBus = new MessageBus();
     renderer = new Renderer();
@@ -175,7 +178,8 @@ void Engine::gameLoop(){
 
             // Drawing is throttled to the screen update rate, so there
             // is no need to do timing here.
-            renderer->drawFrame(gamestate.x, gamestate.y, gamestate.angle);
+            messageBus->notify();
+            renderer->drawFrame();
         }
     }
 }
