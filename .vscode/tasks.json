@@ -11,59 +11,11 @@
             "group": "build"
         },
         {
-            "label": "Install",
-            "dependsOn": [
-                "Assemble"
-            ],
-            "type": "shell",
-            "command": "${workspaceRoot}/gradlew installDebug",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "clean",
+            "label": "Clean",
             "type": "shell",
             "command": "${workspaceRoot}/gradlew clean",
             "group": "none",
             "problemMatcher": []
-        },
-        {
-            "label": "Connect ADB",
-            "type": "shell",
-            "command": "/home/michael/.local/share/android/sdk/platform-tools/adb",
-            "args": [
-                "connect",
-                "localhost:8600"
-            ],
-            "presentation": {
-                "reveal": "always"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Forward debug port",
-            "type": "shell",
-            "command": "/home/michael/.local/share/android/sdk/platform-tools/adb",
-            "args": [
-                "forward",
-                "tcp:8600",
-                "tcp:8600"
-            ],
-            "presentation": {
-                "reveal": "always"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "preDebugTask",
-            "dependsOn": [
-                "Connect ADB",
-                "Install",
-                "Forward debug port"
-            ]
         }
     ]
 }
