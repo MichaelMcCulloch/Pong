@@ -7,15 +7,32 @@
         {
             "label": "Assemble",
             "type": "shell",
-            "command": "${workspaceRoot}/gradlew assembleDebug",
-            "group": "build"
+            "command": [
+                "${workspaceRoot}/gradlew assembleDebug"
+            ],
+            "group": "build",
+            "problemMatcher": []
         },
         {
-            "label": "Clean",
+            "label": "Clean Build",
             "type": "shell",
             "command": "${workspaceRoot}/gradlew clean",
             "group": "none",
             "problemMatcher": []
+        },
+        {
+            "label": "Clean Build Cache",
+            "type": "shell",
+            "command": "${workspaceRoot}/gradlew cleanBuildCache",
+            "group": "none",
+            "problemMatcher": []
+        },
+        {
+            "label": "Clean All",
+            "dependsOn": [
+                "Clean Build",
+                "Clean Build Cache"
+            ]
         }
     ]
 }
