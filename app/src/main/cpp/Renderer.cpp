@@ -165,38 +165,32 @@ void Renderer::drawFrame() {
     }
 
     using namespace glm;
-    float xOff = (float)xDisplacement / (float)width;
-    float yOff = (float)yDisplacement / (float)height;
-    glm::vec2 fingerIsAt = glm::vec2((xOff * 2) -1, -(yOff*2) +1);
 
-    //Create Triangle
-    std::vector<vec2> pts = {
-            vec2(fingerIsAt.x - .5, fingerIsAt.y - sqrt(3) / 6),
-            vec2(fingerIsAt.x + .5, fingerIsAt.y - sqrt(3) / 6),
-            vec2(fingerIsAt.x + 0, fingerIsAt.y + sqrt(3) / 6)
-    };
-    std::vector<vec3> col = {
-            vec3(1, 0, 0),
-            vec3(0, 1, 0),
-            vec3(0, 0, 1)
-    };
+    float aOffset = (float)a_Displacement / (float)width;
+    float bOffset = (float)b_Displacement / (float)width;
+    float aIsAt = (aOffset *2) - 1;
+    float bIsAt = (bOffset *2) - 1;
 
-    std::vector<uint32_t> indices = {
-            0,
-            1,
-            2
+    std::vector<vec2> paddles{
+            vec2(aIsAt - 0.5, -0.9), //PaddleA
+            vec2(aIsAt + 0.5, -0.9),
+            vec2(aIsAt + 0.5, -0.85),
+            vec2(aIsAt - 0.5, -0.85),
+            vec2(bIsAt - 0.5, 0.85), //PaddleB
+            vec2(bIsAt + 0.5, 0.85),
+            vec2(bIsAt + 0.5, 0.9),
+            vec2(bIsAt - 0.5, 0.9)
     };
 
-    std::vector<vec2> paddle{
-            vec2(-0.5, -0.5),
-            vec2(0.5, -0.5),
-            vec2(0.5, 0.5),
-            vec2(-0.5, 0.5)
-    };
     std::vector<u_short> paddleIndices = {
-        0,1,2,2,3,0
+        0,1,2,2,3,0, //paddleA
+        4,5,6,6,7,4 //paddleB
     };
     std::vector<vec3> paddleColor = {
+            vec3(1,1,1),
+            vec3(1,1,1),
+            vec3(1,1,1),
+            vec3(1,1,1),
             vec3(1,1,1),
             vec3(1,1,1),
             vec3(1,1,1),
@@ -209,7 +203,7 @@ void Renderer::drawFrame() {
         LOGW("Renderer: failed to initialize VAO");
         return;
     }
-    if (!LoadGeometry(&triangle, paddle.data(), paddleIndices.data(), paddleColor.data(), 4, 6)){
+    if (!LoadGeometry(&triangle, paddles.data(), paddleIndices.data(), paddleColor.data(), (int)paddles.size(), (int) paddleIndices.size())){
         LOGW("Renderer: failed to load geometry");
     };
 
@@ -259,11 +253,11 @@ void Renderer::termDisplay() {
 
 void Renderer::onNotify(Message message) {
     switch (message.messageType){
-        case _X_DISPLACEMENT:
-            xDisplacement = *(int32_t *)message.data;
+        case _A_POSITION:
+            a_Displacement = *(float_t *)message.data;
             break;
-        case _Y_DISPLACEMENT:
-            yDisplacement = *(int32_t *)message.data;
+        case _B_POSITION:
+            b_Displacement = *(float_t *)message.data;
             break;
         case _APP_CMD_WINDOW_RESIZED:
         case _APP_CMD_CONFIG_CHANGED:

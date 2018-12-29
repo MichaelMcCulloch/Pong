@@ -15,7 +15,9 @@ enum MessageType{
     _APP_CMD_WINDOW_RESIZED,
     _APP_CMD_CONFIG_CHANGED,
     _X_DISPLACEMENT,
-    _Y_DISPLACEMENT
+    _Y_DISPLACEMENT,
+    _A_POSITION,
+    _B_POSITION
 };
 
 char* messageTypeToString(MessageType mt);

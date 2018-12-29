@@ -26,10 +26,8 @@ private:
     EGLSurface surface;
     EGLContext context;
     GLuint shader;
-    int32_t width;
-    int32_t height;
-
-    int xDisplacement = 0, yDisplacement = 0;
+    int32_t width, height;
+    float_t a_Displacement = 0, b_Displacement = 0;
 
     
 

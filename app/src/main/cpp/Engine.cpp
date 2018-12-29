@@ -67,11 +67,16 @@ static int _handleInputProxy(struct android_app *app, AInputEvent* event){
 int32_t Engine::handleEvent(AInputEvent *event) {
     if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
         animating = 1;
-        gamestate.x = (int32_t)AMotionEvent_getX(event, 0);
-        gamestate.y = (int32_t)AMotionEvent_getY(event, 0);
+        float_t x = AMotionEvent_getX(event, 0);
+        float_t y = AMotionEvent_getY(event, 0);
 
-        messageBus->postMessage(_X_DISPLACEMENT, (void *) &gamestate.x);
-        messageBus->postMessage(_Y_DISPLACEMENT, (void *) &gamestate.y);
+        if (y > 2960/2) {
+            gamestate.paddleA = x;
+            messageBus->postMessage(_A_POSITION, (void *) &gamestate.paddleA);
+        } else {
+            gamestate.paddleB = x;
+            messageBus->postMessage(_B_POSITION, (void *) &gamestate.paddleB);
+        }
         return 1;
     }
     return 0;

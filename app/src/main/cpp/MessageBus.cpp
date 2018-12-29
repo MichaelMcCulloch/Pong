@@ -18,6 +18,10 @@ char* messageTypeToString(MessageType mt){
             return (char *) "_X_DISPLACEMENT";
         case _Y_DISPLACEMENT:
             return (char *) "_Y_DISPLACEMENT";
+        case _A_POSITION:
+            return (char*) "_A_POSITION";
+        case _B_POSITION:
+            return (char*) "_B_POSITION";
         default:
             return (char *) "UNKNOWN";
     }
