@@ -2,17 +2,18 @@
 
 #include "common.hpp"
 
+using namespace glm;
+
 struct Geometry
 {
     // OpenGL names for array buffer objects, vertex array object
     GLuint vertexBuffer;
+    GLuint indexBuffer;
     GLuint colourBuffer;
     GLuint vertexArray;
-    GLsizei elementCount;
-    GLenum mode;
 
     // initialize object names to zero (OpenGL reserved value)
-    Geometry() : vertexBuffer(0), colourBuffer(0), vertexArray(0), elementCount(0)
+    Geometry() : vertexBuffer(0), indexBuffer(0), colourBuffer(0), vertexArray(0)
     {
     }
 };
@@ -29,7 +30,9 @@ GLuint LinkProgram(GLuint vertexShader, GLuint fragmentShader);
 bool InitializeVAO(Geometry *geometry);
 
 // create buffers and fill with geometry data, returning true if successful
-bool LoadGeometry(Geometry *geometry, glm::vec2 *vertices, glm::vec3 *colours, int elementCount);
+bool LoadGeometry(Geometry *geometry, vec2 *vertices, u_short *indices, vec3 *colours,
+                  int elementCount,
+                  int indicesCount);
 
 // deallocate geometry-related objects
 void DestroyGeometry(Geometry *geometry);

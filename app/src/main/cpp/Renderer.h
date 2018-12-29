@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <memory>
 
 #include "glutil.h"
 #include "MessageBus.h"
@@ -29,6 +30,8 @@ private:
     int32_t height;
 
     int xDisplacement = 0, yDisplacement = 0;
+
+    
 
     void termDisplay();
 

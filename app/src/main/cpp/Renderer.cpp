@@ -164,31 +164,52 @@ void Renderer::drawFrame() {
         return;
     }
 
+    using namespace glm;
     float xOff = (float)xDisplacement / (float)width;
     float yOff = (float)yDisplacement / (float)height;
     glm::vec2 fingerIsAt = glm::vec2((xOff * 2) -1, -(yOff*2) +1);
 
     //Create Triangle
-    std::vector<glm::vec2> pts = {
-            glm::vec2(fingerIsAt.x - .5, fingerIsAt.y - sqrt(3) / 6),
-            glm::vec2(fingerIsAt.x + .5, fingerIsAt.y - sqrt(3) / 6),
-            glm::vec2(fingerIsAt.x + 0, fingerIsAt.y + sqrt(3) / 6)
+    std::vector<vec2> pts = {
+            vec2(fingerIsAt.x - .5, fingerIsAt.y - sqrt(3) / 6),
+            vec2(fingerIsAt.x + .5, fingerIsAt.y - sqrt(3) / 6),
+            vec2(fingerIsAt.x + 0, fingerIsAt.y + sqrt(3) / 6)
+    };
+    std::vector<vec3> col = {
+            vec3(1, 0, 0),
+            vec3(0, 1, 0),
+            vec3(0, 0, 1)
     };
 
-
-    std::vector<glm::vec3> col = {
-            glm::vec3(1, 0, 0),
-            glm::vec3(0, 1, 0),
-            glm::vec3(0, 0, 1)
+    std::vector<uint32_t> indices = {
+            0,
+            1,
+            2
     };
 
+    std::vector<vec2> paddle{
+            vec2(-0.5, -0.5),
+            vec2(0.5, -0.5),
+            vec2(0.5, 0.5),
+            vec2(-0.5, 0.5)
+    };
+    std::vector<u_short> paddleIndices = {
+        0,1,2,2,3,0
+    };
+    std::vector<vec3> paddleColor = {
+            vec3(1,1,1),
+            vec3(1,1,1),
+            vec3(1,1,1),
+            vec3(1,1,1),
+
+    };
 
     Geometry triangle;
     if (!InitializeVAO(&triangle)){
         LOGW("Renderer: failed to initialize VAO");
         return;
     }
-    if (!LoadGeometry(&triangle, pts.data(), col.data(), 3)){
+    if (!LoadGeometry(&triangle, paddle.data(), paddleIndices.data(), paddleColor.data(), 4, 6)){
         LOGW("Renderer: failed to load geometry");
     };
 
@@ -197,8 +218,13 @@ void Renderer::drawFrame() {
 
     glUseProgram(shader);
     glBindVertexArray(triangle.vertexArray);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,triangle.indexBuffer);
 
-    glDrawArrays(GL_TRIANGLES, 0, 3);
+    glDrawElements(GL_TRIANGLES,
+                   (GLsizei) paddleIndices.size(),
+                   GL_UNSIGNED_SHORT,
+                   (void*)0
+    );
 
     glBindVertexArray(0);
     glUseProgram(0);

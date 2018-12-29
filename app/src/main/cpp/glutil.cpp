@@ -94,6 +94,9 @@ bool InitializeVAO(Geometry *geometry)
     // create an array buffer object for storing our vertices
     glGenBuffers(1, &geometry->vertexBuffer);
 
+    //create one for storing the indices
+    glGenBuffers(1, &geometry->indexBuffer);
+
     // create another one for storing our colours
     glGenBuffers(1, &geometry->colourBuffer);
 
@@ -109,7 +112,7 @@ bool InitializeVAO(Geometry *geometry)
             2,			  //# of components
             GL_FLOAT,	 //Type of component
             GL_FALSE,	 //Should be normalized?
-            sizeof(glm::vec2), //Stride - can use 0 if tightly packed
+            sizeof(vec2), //Stride - can use 0 if tightly packed
             0);			  //Offset to first element
     glEnableVertexAttribArray(VERTEX_INDEX);
 
@@ -120,7 +123,7 @@ bool InitializeVAO(Geometry *geometry)
             3,			  //# of components
             GL_FLOAT,	 //Type of component
             GL_FALSE,	 //Should be normalized?
-            sizeof(glm::vec3), //Stride - can use 0 if tightly packed
+            sizeof(vec3), //Stride - can use 0 if tightly packed
             0);			  //Offset to first element
     glEnableVertexAttribArray(COLOUR_INDEX);
 
@@ -132,17 +135,21 @@ bool InitializeVAO(Geometry *geometry)
 }
 
 // create buffers and fill with geometry data, returning true if successful
-bool LoadGeometry(Geometry *geometry, glm::vec2 *vertices, glm::vec3 *colours, int elementCount)
+bool LoadGeometry(Geometry *geometry, vec2 *vertices, u_short *indices, vec3 *colours,
+                  int elementCount,
+                  int indicesCount)
 {
-    geometry->elementCount = elementCount;
-
     // create an array buffer object for storing our vertices
     glBindBuffer(GL_ARRAY_BUFFER, geometry->vertexBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * geometry->elementCount, vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vec2) * elementCount, vertices, GL_STATIC_DRAW);
+
+    // create one for storing the indices
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, geometry->indexBuffer);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(u_short) * indicesCount, indices, GL_STATIC_DRAW);
 
     // create another one for storing our colours
     glBindBuffer(GL_ARRAY_BUFFER, geometry->colourBuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * geometry->elementCount, colours, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * elementCount, colours, GL_STATIC_DRAW);
 
     //Unbind buffer to reset to default state
     glBindBuffer(GL_ARRAY_BUFFER, 0);
