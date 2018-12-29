@@ -65,21 +65,30 @@ static int _handleInputProxy(struct android_app *app, AInputEvent* event){
  * Process the next input event.
  */
 int32_t Engine::handleEvent(AInputEvent *event) {
-    if (AInputEvent_getType(event) == AINPUT_EVENT_TYPE_MOTION) {
+    const int action = AMotionEvent_getAction(event);
+    const int type = action & AMOTION_EVENT_ACTION_MASK;
+    if (type == AMOTION_EVENT_ACTION_MOVE) {
         animating = 1;
-        float_t x = AMotionEvent_getX(event, 0);
-        float_t y = AMotionEvent_getY(event, 0);
-
-        if (y > 2960/2) {
-            gamestate.paddleA = x;
-            messageBus->postMessage(_A_POSITION, (void *) &gamestate.paddleA);
-        } else {
-            gamestate.paddleB = x;
-            messageBus->postMessage(_B_POSITION, (void *) &gamestate.paddleB);
-        }
+    } else {
         return 1;
     }
-    return 0;
+    size_t count = AMotionEvent_getPointerCount(event);
+
+    for (int i = 0; i < count; ++i) {
+        const float x = AMotionEvent_getX(event, i);
+        const float y = AMotionEvent_getY(event, i);
+        LOGV("Motion %d, %f, %f", i, x, y);
+        if (y > 2960/2) { //TODO: Remove magic number
+            //A
+            gamestate.paddleA = x;
+            messageBus->postMessage(_A_POSITION, (void*) &gamestate.paddleA);
+        } else {
+            //B
+            gamestate.paddleB = x;
+            messageBus->postMessage(_B_POSITION, (void*) &gamestate.paddleB);
+        }
+    }
+    return 0 ;
 }
 
 /**
