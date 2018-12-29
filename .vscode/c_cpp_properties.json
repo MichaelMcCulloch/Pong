@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/app/src/main/cpp/**",
+                "/home/michael/.local/share/android/sdk/ndk-bundle/sources/android/native_app_glue/**",
+                "/home/michael/.local/share/android/sdk/ndk-bundle/sources/cxx-stl/llvm-libc++/include/**",
+                "/home/michael/.local/share/android/sdk/ndk-bundle/sysroot/usr/include/**",
+                "/home/michael/.local/share/android/sdk/ndk-bundle/sources/third_party/googletest/include/**"
+            ],
+            "defines": ["__ANDROID__"],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}

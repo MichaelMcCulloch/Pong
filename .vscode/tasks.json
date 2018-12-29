@@ -1,0 +1,69 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "adb" : "/home/michael/.local/share/android/sdk/platform-tools/adb",
+    "tasks": [
+        {
+            "label": "Assemble",
+            "type": "shell",
+            "command": "${workspaceRoot}/gradlew assembleDebug",
+            "group": "build"
+        },
+        {
+            "label": "Install",
+            "dependsOn": [
+                "Assemble"
+            ],
+            "type": "shell",
+            "command": "${workspaceRoot}/gradlew installDebug",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "clean",
+            "type": "shell",
+            "command": "${workspaceRoot}/gradlew clean",
+            "group": "none",
+            "problemMatcher": []
+        },
+        {
+            "label": "Connect ADB",
+            "type": "shell",
+            "command": "/home/michael/.local/share/android/sdk/platform-tools/adb",
+            "args": [
+                "connect",
+                "localhost:8600"
+            ],
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Forward debug port",
+            "type": "shell",
+            "command": "/home/michael/.local/share/android/sdk/platform-tools/adb",
+            "args": [
+                "forward",
+                "tcp:8600",
+                "tcp:8600"
+            ],
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "preDebugTask",
+            "dependsOn": [
+                "Connect ADB",
+                "Install",
+                "Forward debug port"
+            ]
+        }
+    ]
+}

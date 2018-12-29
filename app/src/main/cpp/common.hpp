@@ -4,6 +4,8 @@
 
 #pragma once
 
+
+
 extern "C" {
     #include <EGL/egl.h>
     #include <GLES3/gl32.h>
