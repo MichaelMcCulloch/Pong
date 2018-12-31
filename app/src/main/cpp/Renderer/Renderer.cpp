@@ -254,10 +254,10 @@ void Renderer::termDisplay() {
 void Renderer::onNotify(Message message) {
     switch (message.messageType){
         case _A_POSITION:
-            a_Displacement = *(float_t *)message.data;
+            a_Displacement = *(float *)message.data;
             break;
         case _B_POSITION:
-            b_Displacement = *(float_t *)message.data;
+            b_Displacement = *(float *)message.data;
             break;
         case _APP_CMD_WINDOW_RESIZED:
         case _APP_CMD_CONFIG_CHANGED:

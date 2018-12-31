@@ -5,12 +5,40 @@
 #include "Engine.h"
 
 
+
+/**
+ * This is the main entry point of a native application that is using
+ * android_native_app_glue.  It runs in its own thread, with its own
+ * event loop for receiving input events and doing other things.
+ */
+void android_main(struct android_app* state) {
+
+#if TESTING
+    int argc = 1;
+
+    char *name = (char *) "Testing";
+    char **argv = &name;
+    ::testing::InitGoogleTest(&argc, argv);
+    if (RUN_ALL_TESTS()) return;
+#endif
+
+    //TODO: Initialize MessageBus, renderer
+    Engine *engine = new Engine();
+    engine->startUp(state);
+    engine->gameLoop();
+    engine->shutDown();
+
+
+
+}
+
 /*
  * AcquireASensorManagerInstance(void)
  *    Workaround ASensorManager_getInstance() deprecation false alarm
  *    for Android-N and before, when compiling with NDK-r15
  */
-#include <dlfcn.h>
+
+
 ASensorManager *AcquireASensorManagerInstance(android_app *app) {
 
     if (!app)

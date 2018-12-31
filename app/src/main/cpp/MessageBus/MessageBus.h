@@ -5,7 +5,7 @@
 #include <queue>
 #include <vector>
 
-#include "common.hpp"
+#include "logging.h"
 
 enum MessageType{
     _APP_CMD_SAVE_STATE,

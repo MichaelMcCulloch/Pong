@@ -24,8 +24,7 @@
 #include <cstring>
 #include <cassert>
 
-
-#include "common.hpp"
+#include "logging.h"
 #include "MessageBus.h"
 #include "Renderer.h"
 #include "Engine.h"
@@ -37,29 +36,6 @@
 #endif
 
 
-/**
- * This is the main entry point of a native application that is using
- * android_native_app_glue.  It runs in its own thread, with its own
- * event loop for receiving input events and doing other things.
- */
-void android_main(struct android_app* state) {
-
-    #if TESTING
-    int argc = 1;
-
-    char *name = (char *) "Testing";
-    char **argv = &name;
-    ::testing::InitGoogleTest(&argc, argv);
-    if (RUN_ALL_TESTS()) return;
-    #endif
-
-    //TODO: Initialize MessageBus, renderer
-    Engine *engine = new Engine();
-    engine->startUp(state);
-    engine->gameLoop();
-    engine->shutDown();
 
 
-
-}
 //END_INCLUDE(all)

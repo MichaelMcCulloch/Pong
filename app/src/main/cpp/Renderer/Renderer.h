@@ -4,8 +4,13 @@
 #include <vector>
 #include <memory>
 
-#include "glutil.h"
+#include "glm/glm.hpp"
+
+#include "glutil/glutil.h"
+#include <EGL/egl.h>
 #include "MessageBus.h"
+#include "logging.h"
+
 
 class Renderer : public BusNode {
 public:
@@ -27,7 +32,7 @@ private:
     EGLContext context;
     GLuint shader;
     int32_t width, height;
-    float_t a_Displacement = 0, b_Displacement = 0;
+    float a_Displacement = 0, b_Displacement = 0;
 
     
 

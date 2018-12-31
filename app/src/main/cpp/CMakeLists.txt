@@ -16,30 +16,11 @@ set(CMAKE_SHARED_LINKER_FLAGS
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Werror")
 add_definitions("-DGLM_FORCE_SIZE_T_LENGTH -DGLM_FORCE_RADIANS")
 
-#Import CMakeLists.txt from glm library
-add_subdirectory(glm)
+
+add_subdirectory(MessageBus)
+add_subdirectory(Renderer)
+add_subdirectory(Engine)
 
 
 
-#Build the library
-add_library(native-activity SHARED
-        android_main.cpp
-        glutil.cpp
-        Engine.cpp
-        MessageBus.cpp
-        Renderer.cpp)
-
-target_include_directories(native-activity PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${ANDROID_NDK}/sources/android/native_app_glue)
-
-#Link to all created libraries
-target_link_libraries(native-activity
-        android
-        native_app_glue
-        EGL
-        GLESv3
-        glm
-        log)
-
-add_subdirectory(tests)
+#add_subdirectory(tests)

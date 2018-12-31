@@ -4,10 +4,14 @@
 
 #pragma once
 
+#include <dlfcn.h>
+#include <android/sensor.h>
+#include <android_native_app_glue.h>
+
 #include "MessageBus.h"
 #include "Renderer.h"
 
-
+void android_main(android_app* state);
 
 class Engine {
 
@@ -30,8 +34,8 @@ private:
     MessageBus *messageBus;
     struct gamestate {
         int32_t x, y;
-        float_t angle;
-        float_t paddleA, paddleB;
+        float angle;
+        float paddleA, paddleB;
         int64_t scoreA, scoreB;
     };
     struct gamestate gamestate;

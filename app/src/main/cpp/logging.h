@@ -1,28 +1,7 @@
-//
-// Created by michael on 25/12/18.
-//
 
 #pragma once
 
-
-
-extern "C" {
-    #include <EGL/egl.h>
-    #include <GLES3/gl32.h>
-    #include <jni.h>
-    #include <errno.h>
-    #include <android/sensor.h>
-    #include <android/log.h>
-    #include <android_native_app_glue.h>
-    #include <unistd.h>
-    #include <stdlib.h>
-
-}
-
-#include "glm/glm.hpp"
-#include "glm/gtc/type_ptr.hpp"
-#include "glm/gtc/matrix_transform.hpp"
-
+#include <android/log.h>
 #define DEBUG_TAG "PONG: "
 #define LOGV(...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, DEBUG_TAG, __VA_ARGS__))
 #define LOGD(...) ((void)__android_log_print(ANDROID_LOG_DEBUG, DEBUG_TAG, __VA_ARGS__))
