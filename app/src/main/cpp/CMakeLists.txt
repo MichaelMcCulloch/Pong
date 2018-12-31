@@ -3,13 +3,6 @@ project(MainActivity)
 cmake_minimum_required(VERSION 3.4.1)
 
 
-# GoogleTest Integration
-set(GOOGLETEST_ROOT ${ANDROID_NDK}/sources/third_party/googletest)
-add_library(gtest STATIC ${GOOGLETEST_ROOT}/src/gtest_main.cc ${GOOGLETEST_ROOT}/src/gtest-all.cc)
-target_include_directories(gtest PRIVATE ${GOOGLETEST_ROOT})
-target_include_directories(gtest PUBLIC ${GOOGLETEST_ROOT}/include)
-
-
 # build native_app_glue as a static lib
 add_library(native_app_glue STATIC
         ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
@@ -25,6 +18,8 @@ add_definitions("-DGLM_FORCE_SIZE_T_LENGTH -DGLM_FORCE_RADIANS")
 
 #Import CMakeLists.txt from glm library
 add_subdirectory(glm)
+
+
 
 #Build the library
 add_library(native-activity SHARED
@@ -42,8 +37,9 @@ target_include_directories(native-activity PRIVATE
 target_link_libraries(native-activity
         android
         native_app_glue
-        gtest
         EGL
         GLESv3
         glm
         log)
+
+add_subdirectory(tests)
