@@ -7,9 +7,6 @@
 #include "../MessageBus/MessageBus.h"
 #include "../logging.h"
 
-#include "gtest/gtest.h"
-#include "gmock/gmock.h"
-
 using ::testing::AtLeast;
 
 class MockBusNode : public BusNode {
