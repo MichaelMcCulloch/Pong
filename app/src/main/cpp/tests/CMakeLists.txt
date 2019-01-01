@@ -6,32 +6,32 @@ target_include_directories(gtest PUBLIC ${GOOGLETEST_ROOT}/include)
 
 
 add_library(nativehelper
-  INTERFACE
-)
+        INTERFACE
+        )
 
 target_include_directories(nativehelper
-  INTERFACE
-    ${CMAKE_CURRENT_SOURCE_DIR}
-)
+        INTERFACE
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        )
 
 add_library(gtestjni
-  STATIC
-    gtest_wrapper.cpp
-)
+        STATIC
+        gtest_wrapper.cpp
+        )
 
 target_link_libraries(gtestjni
-  PRIVATE
-    gtest
-    nativehelper
-  PUBLIC
-    -uJava_com_michael_pong_GtestRunner_nInitialize
-    -uJava_com_michael_pong_GtestRunner_nRun
-)
+        PRIVATE
+        gtest
+        nativehelper
+        PUBLIC
+        -uJava_com_michael_pong_GtestRunner_nInitialize
+        -uJava_com_michael_pong_GtestRunner_nRun
+        )
 
 add_library(testDriver
-  SHARED
-    testDriver.cpp
-)
+        SHARED
+        testDriver.cpp
+        )
 
 target_include_directories(testDriver PRIVATE
         ${CMAKE_SOURCE_DIR}/
@@ -43,10 +43,10 @@ target_include_directories(testDriver PRIVATE
 
 
 target_link_libraries(testDriver
-  PRIVATE
-    RendererLIB
-    MessageBusLIB
-    EngineLIB
-    gtest
-    gtestjni
-)
+        PRIVATE
+        RendererLIB
+        MessageBusLIB
+        EngineLIB
+        gtest
+        gtestjni
+        )

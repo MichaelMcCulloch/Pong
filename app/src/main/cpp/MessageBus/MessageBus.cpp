@@ -1,7 +1,7 @@
 #include "MessageBus.h"
 
-char* messageTypeToString(MessageType mt){
-    switch(mt) {
+char *messageTypeToString(MessageType mt) {
+    switch (mt) {
         case _APP_CMD_SAVE_STATE:
             return (char *) "_APP_CMD_SAVE_STATE";
         case _APP_CMD_INIT_WINDOW:
@@ -19,9 +19,9 @@ char* messageTypeToString(MessageType mt){
         case _Y_DISPLACEMENT:
             return (char *) "_Y_DISPLACEMENT";
         case _A_POSITION:
-            return (char*) "_A_POSITION";
+            return (char *) "_A_POSITION";
         case _B_POSITION:
-            return (char*) "_B_POSITION";
+            return (char *) "_B_POSITION";
         default:
             return (char *) "UNKNOWN";
     }
@@ -33,11 +33,12 @@ void MessageBus::addReceiver(std::function<void(Message)> messageReceiver) {
 
 void MessageBus::sendMessage(Message message) {
 
-    LOGV("MsgBus : Received %s", messageTypeToString(message.messageType));
+    LOGV("MsgBus : Received %s",
+         messageTypeToString(message.messageType));
     messages.push(message);
 }
 
-void MessageBus::postMessage(MessageType messageType, void * data){
+void MessageBus::postMessage(MessageType messageType, void *data) {
     struct Message msg = {
             messageType,
             data
@@ -69,10 +70,10 @@ void BusNode::send(Message message) {
 }
 
 
-
 void BusNode::startUp(MessageBus *messageBus) {
     this->messageBus = messageBus;
-    this->messageBus->addReceiver(this->getNotifyFunc());
+    this->messageBus
+        ->addReceiver(this->getNotifyFunc());
 }
 
 void BusNode::shutdown() {

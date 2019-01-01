@@ -32,7 +32,7 @@
 #define TESTING 0
 
 #if TESTING
-    #include "gtest/gtest.h"
+#include "gtest/gtest.h"
 #endif
 
 

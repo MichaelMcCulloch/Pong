@@ -11,24 +11,28 @@
 #include "MessageBus.h"
 #include "Renderer.h"
 
-void android_main(android_app* state);
+void android_main(android_app *state);
 
 class Engine {
 
 public:
-    Engine(){};
-    ~Engine(){};
+    Engine() {};
+
+    ~Engine() {};
 
     void startUp(android_app *state);
+
     void shutDown();
+
     void gameLoop();
 
     int32_t handleEvent(AInputEvent *event);
+
     void handleCommand(int32_t cmd);
 
 private:
     bool animating;
-    struct android_app* mApp;
+    struct android_app *mApp;
     Renderer *renderer;
 
     MessageBus *messageBus;

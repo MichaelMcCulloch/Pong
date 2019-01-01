@@ -5,13 +5,12 @@
 #include "Engine.h"
 
 
-
 /**
  * This is the main entry point of a native application that is using
  * android_native_app_glue.  It runs in its own thread, with its own
  * event loop for receiving input events and doing other things.
  */
-void android_main(struct android_app* state) {
+void android_main(struct android_app *state) {
 
 #if TESTING
     int argc = 1;
@@ -29,7 +28,6 @@ void android_main(struct android_app* state) {
     engine->shutDown();
 
 
-
 }
 
 /*
@@ -45,24 +43,51 @@ ASensorManager *AcquireASensorManagerInstance(android_app *app) {
         return nullptr;
 
     typedef ASensorManager *(*PF_GETINSTANCEFORPACKAGE)(const char *name);
-    void *androidHandle = dlopen("libandroid.so", RTLD_NOW);
+    void *androidHandle = dlopen(
+            "libandroid.so",
+            RTLD_NOW
+    );
     PF_GETINSTANCEFORPACKAGE getInstanceForPackageFunc = (PF_GETINSTANCEFORPACKAGE)
-            dlsym(androidHandle, "ASensorManager_getInstanceForPackage");
+            dlsym(
+                    androidHandle,
+                    "ASensorManager_getInstanceForPackage"
+            );
     if (getInstanceForPackageFunc) {
         JNIEnv *env = nullptr;
-        app->activity->vm->AttachCurrentThread(&env, NULL);
+        app->activity
+           ->vm
+           ->AttachCurrentThread(
+                   &env,
+                   NULL
+           );
 
-        jclass android_content_Context = env->GetObjectClass(app->activity->clazz);
-        jmethodID midGetPackageName = env->GetMethodID(android_content_Context,
-                                                       "getPackageName",
-                                                       "()Ljava/lang/String;");
-        jstring packageName = (jstring) env->CallObjectMethod(app->activity->clazz,
-                                                              midGetPackageName);
+        jclass android_content_Context = env->GetObjectClass(
+                app->activity
+                   ->clazz
+        );
+        jmethodID midGetPackageName = env->GetMethodID(
+                android_content_Context,
+                "getPackageName",
+                "()Ljava/lang/String;"
+        );
+        jstring packageName = (jstring) env->CallObjectMethod(
+                app->activity
+                   ->clazz,
+                midGetPackageName
+        );
 
-        const char *nativePackageName = env->GetStringUTFChars(packageName, 0);
+        const char *nativePackageName = env->GetStringUTFChars(
+                packageName,
+                0
+        );
         ASensorManager *mgr = getInstanceForPackageFunc(nativePackageName);
-        env->ReleaseStringUTFChars(packageName, nativePackageName);
-        app->activity->vm->DetachCurrentThread();
+        env->ReleaseStringUTFChars(
+                packageName,
+                nativePackageName
+        );
+        app->activity
+           ->vm
+           ->DetachCurrentThread();
         if (mgr) {
             dlclose(androidHandle);
             return mgr;
@@ -71,7 +96,10 @@ ASensorManager *AcquireASensorManagerInstance(android_app *app) {
 
     typedef ASensorManager *(*PF_GETINSTANCE)();
     PF_GETINSTANCE getInstanceFunc = (PF_GETINSTANCE)
-            dlsym(androidHandle, "ASensorManager_getInstance");
+            dlsym(
+                    androidHandle,
+                    "ASensorManager_getInstance"
+            );
     // by all means at this point, ASensorManager_getInstance should be available
     assert(getInstanceFunc);
     dlclose(androidHandle);
@@ -79,13 +107,13 @@ ASensorManager *AcquireASensorManagerInstance(android_app *app) {
     return getInstanceFunc();
 }
 
-static void _handleCmdProxy(struct android_app *app, int32_t cmd){
-    Engine* engine = (Engine*) app->userData;
+static void _handleCmdProxy(struct android_app *app, int32_t cmd) {
+    Engine *engine = (Engine *) app->userData;
     engine->handleCommand(cmd);
 }
 
-static int _handleInputProxy(struct android_app *app, AInputEvent* event){
-    Engine* engine = (Engine*) app->userData;
+static int _handleInputProxy(struct android_app *app, AInputEvent *event) {
+    Engine *engine = (Engine *) app->userData;
     return engine->handleEvent(event);
 }
 
@@ -103,20 +131,35 @@ int32_t Engine::handleEvent(AInputEvent *event) {
     size_t count = AMotionEvent_getPointerCount(event);
 
     for (int i = 0; i < count; ++i) {
-        const float x = AMotionEvent_getX(event, i);
-        const float y = AMotionEvent_getY(event, i);
-        LOGV("Motion %d, %f, %f", i, x, y);
-        if (y > 2960/2) { //TODO: Remove magic number
+        const float x = AMotionEvent_getX(
+                event,
+                i
+        );
+        const float y = AMotionEvent_getY(
+                event,
+                i
+        );
+        LOGV("Motion %d, %f, %f",
+             i,
+             x,
+             y);
+        if (y > 2960 / 2) { //TODO: Remove magic number
             //A
             gamestate.paddleA = x;
-            messageBus->postMessage(_A_POSITION, (void*) &gamestate.paddleA);
+            messageBus->postMessage(
+                    _A_POSITION,
+                    (void *) &gamestate.paddleA
+            );
         } else {
             //B
             gamestate.paddleB = x;
-            messageBus->postMessage(_B_POSITION, (void*) &gamestate.paddleB);
+            messageBus->postMessage(
+                    _B_POSITION,
+                    (void *) &gamestate.paddleB
+            );
         }
     }
-    return 0 ;
+    return 0;
 }
 
 /**
@@ -125,35 +168,56 @@ int32_t Engine::handleEvent(AInputEvent *event) {
 void Engine::handleCommand(int32_t cmd) {
     switch (cmd) {
         case APP_CMD_SAVE_STATE:
-            messageBus->postMessage(_APP_CMD_SAVE_STATE, NULL);
+            messageBus->postMessage(
+                    _APP_CMD_SAVE_STATE,
+                    NULL
+            );
             // The system has asked us to save our current state.  Do so.
             mApp->savedState = malloc(sizeof(struct gamestate));
             *(struct gamestate *) mApp->savedState = gamestate;
             mApp->savedStateSize = sizeof(struct gamestate);
             break;
         case APP_CMD_INIT_WINDOW:
-            messageBus->postMessage(_APP_CMD_INIT_WINDOW,  NULL);
+            messageBus->postMessage(
+                    _APP_CMD_INIT_WINDOW,
+                    NULL
+            );
             // The window is being shown, get it ready.
             if (mApp->window != NULL) {
-                renderer->startUp(mApp->window,messageBus);
+                renderer->startUp(
+                        mApp->window,
+                        messageBus
+                );
                 renderer->drawFrame();
             }
             break;
         case APP_CMD_TERM_WINDOW:
-            messageBus->postMessage(_APP_CMD_TERM_WINDOW, NULL);
+            messageBus->postMessage(
+                    _APP_CMD_TERM_WINDOW,
+                    NULL
+            );
             // The window is being hidden or closed, clean it up.
             renderer->shutDown();
             break;
         case APP_CMD_LOST_FOCUS:
-            messageBus->postMessage(_APP_CMD_LOST_FOCUS, NULL);
+            messageBus->postMessage(
+                    _APP_CMD_LOST_FOCUS,
+                    NULL
+            );
             animating = 0;
             renderer->drawFrame();
             break;
         case APP_CMD_WINDOW_RESIZED:
-            messageBus->postMessage(_APP_CMD_WINDOW_RESIZED, NULL);
+            messageBus->postMessage(
+                    _APP_CMD_WINDOW_RESIZED,
+                    NULL
+            );
             break;
         case APP_CMD_CONFIG_CHANGED:
-            messageBus->postMessage(_APP_CMD_CONFIG_CHANGED, NULL);
+            messageBus->postMessage(
+                    _APP_CMD_CONFIG_CHANGED,
+                    NULL
+            );
             break;
         default:
             LOGV("Engine: (unused command).");
@@ -161,14 +225,15 @@ void Engine::handleCommand(int32_t cmd) {
     }
 }
 
-void Engine::startUp(struct android_app * state) {
+void Engine::startUp(struct android_app *state) {
     mApp = state;
-    memset(&gamestate, 0, sizeof(struct gamestate));
+    memset(
+            &gamestate,
+            0,
+            sizeof(struct gamestate));
 
     messageBus = new MessageBus();
     renderer = new Renderer();
-
-
 
 
     if (state->savedState != NULL) {
@@ -178,7 +243,7 @@ void Engine::startUp(struct android_app * state) {
 
 }
 
-void Engine::gameLoop(){
+void Engine::gameLoop() {
 
     //engine subsystems cannot accept commands before they startUp();
     mApp->userData = this;
@@ -190,17 +255,24 @@ void Engine::gameLoop(){
         // Read all pending events.
         int ident;
         int events;
-        struct android_poll_source* source;
+        struct android_poll_source *source;
 
         // If not animating, we will block forever waiting for events.
         // If animating, we loop until all events are read, then continue
         // to draw the next frame of animation.
-        while ((ident = ALooper_pollAll(animating ? 0 : -1, NULL, &events,
-                                        (void **) &source)) >= 0) {
+        while ((ident = ALooper_pollAll(
+                animating ? 0 : -1,
+                NULL,
+                &events,
+                (void **) &source
+        )) >= 0) {
 
             // Process this event.
             if (source != NULL) {
-                source->process(mApp, source);
+                source->process(
+                        mApp,
+                        source
+                );
             }
 
             // Check if we are exiting.

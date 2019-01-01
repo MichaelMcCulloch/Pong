@@ -7,10 +7,12 @@
 #include "../Renderer/Renderer.h"
 #include "../logging.h"
 
-TEST(rendererTest1, pass) {
+TEST(rendererTest1,
+     pass) {
     Renderer r = Renderer();
 }
 
-TEST(rendererTest2, fail) {
+TEST(rendererTest2,
+     fail) {
 
 }

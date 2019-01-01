@@ -7,7 +7,7 @@
 
 #include "logging.h"
 
-enum MessageType{
+enum MessageType {
     _APP_CMD_SAVE_STATE,
     _APP_CMD_INIT_WINDOW,
     _APP_CMD_TERM_WINDOW,
@@ -20,22 +20,26 @@ enum MessageType{
     _B_POSITION
 };
 
-char* messageTypeToString(MessageType mt);
+char *messageTypeToString(MessageType mt);
 
 struct Message {
     MessageType messageType;
-    void * data;
+    void *data;
 };
 
 
 class MessageBus {
 public:
     MessageBus() {};
+
     ~MessageBus() {};
 
     void addReceiver(std::function<void(struct Message)> messageReceiver);
+
     void sendMessage(struct Message message);
-    void postMessage(MessageType, void*);
+
+    void postMessage(MessageType, void *);
+
     void notify();
 
 private:
@@ -45,8 +49,10 @@ private:
 
 class BusNode {
 public:
-    void startUp(MessageBus*);
+    void startUp(MessageBus *);
+
     void shutdown();
+
     virtual void update() {}
 
 protected:

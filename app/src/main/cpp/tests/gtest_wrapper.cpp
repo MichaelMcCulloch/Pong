@@ -50,62 +50,99 @@ static struct {
 
 jobject gEmptyAnnotationsArray;
 
-static jobject createTestDescription(JNIEnv* env, const char* className, const char* testName) {
-    ScopedLocalRef<jstring> jClassName(env, env->NewStringUTF(className));
-    ScopedLocalRef<jstring> jTestName(env, env->NewStringUTF(testName));
-    return env->CallStaticObjectMethod(gDescription.clazz, gDescription.createTestDescription,
-            jClassName.get(), jTestName.get(), gEmptyAnnotationsArray);
+static jobject createTestDescription(JNIEnv *env, const char *className, const char *testName) {
+    ScopedLocalRef<jstring> jClassName(
+            env,
+            env->NewStringUTF(className));
+    ScopedLocalRef<jstring> jTestName(
+            env,
+            env->NewStringUTF(testName));
+    return env->CallStaticObjectMethod(
+            gDescription.clazz,
+            gDescription.createTestDescription,
+            jClassName.get(),
+            jTestName.get(),
+            gEmptyAnnotationsArray
+    );
 }
 
-static void addChild(JNIEnv* env, jobject description, jobject childDescription) {
-    env->CallVoidMethod(description, gDescription.addChild, childDescription);
+static void addChild(JNIEnv *env, jobject description, jobject childDescription) {
+    env->CallVoidMethod(
+            description,
+            gDescription.addChild,
+            childDescription
+    );
 }
 
 
 class JUnitNotifyingListener : public ::testing::EmptyTestEventListener {
 public:
 
-    JUnitNotifyingListener(JNIEnv* env, jobject runNotifier)
-            : mEnv(env)
-            , mRunNotifier(runNotifier)
-            , mCurrentTestDescription{env, nullptr}
-    {}
+    JUnitNotifyingListener(JNIEnv *env, jobject runNotifier)
+            : mEnv(env), mRunNotifier(runNotifier), mCurrentTestDescription{env, nullptr} {}
+
     virtual ~JUnitNotifyingListener() {}
 
     virtual void OnTestStart(const testing::TestInfo &testInfo) override {
         mCurrentTestDescription.reset(
-                createTestDescription(mEnv, testInfo.test_case_name(), testInfo.name()));
+                createTestDescription(
+                        mEnv,
+                        testInfo.test_case_name(),
+                        testInfo.name()));
         notify(gRunNotifier.fireTestStarted);
     }
 
     virtual void OnTestPartResult(const testing::TestPartResult &testPartResult) override {
         if (!testPartResult.passed()) {
             char message[1024];
-            snprintf(message, 1024, "%s:%d\n%s", testPartResult.file_name(), testPartResult.line_number(),
+            snprintf(
+                    message,
+                    1024,
+                    "%s:%d\n%s",
+                    testPartResult.file_name(),
+                    testPartResult.line_number(),
                     testPartResult.message());
-            ScopedLocalRef<jstring> jmessage(mEnv, mEnv->NewStringUTF(message));
-            ScopedLocalRef<jobject> jthrowable(mEnv, mEnv->NewObject(gAssertionFailure.clazz,
-                    gAssertionFailure.ctor, jmessage.get()));
-            ScopedLocalRef<jobject> jfailure(mEnv, mEnv->NewObject(gFailure.clazz,
-                    gFailure.ctor, mCurrentTestDescription.get(), jthrowable.get()));
-            mEnv->CallVoidMethod(mRunNotifier, gRunNotifier.fireTestFailure, jfailure.get());
+            ScopedLocalRef<jstring> jmessage(
+                    mEnv,
+                    mEnv->NewStringUTF(message));
+            ScopedLocalRef<jobject> jthrowable(
+                    mEnv,
+                    mEnv->NewObject(
+                            gAssertionFailure.clazz,
+                            gAssertionFailure.ctor,
+                            jmessage.get()));
+            ScopedLocalRef<jobject> jfailure(
+                    mEnv,
+                    mEnv->NewObject(
+                            gFailure.clazz,
+                            gFailure.ctor,
+                            mCurrentTestDescription.get(),
+                            jthrowable.get()));
+            mEnv->CallVoidMethod(
+                    mRunNotifier,
+                    gRunNotifier.fireTestFailure,
+                    jfailure.get());
         }
     }
 
-    virtual void OnTestEnd(const testing::TestInfo&) override {
+    virtual void OnTestEnd(const testing::TestInfo &) override {
         notify(gRunNotifier.fireTestFinished);
         mCurrentTestDescription.reset();
     }
 
-    virtual void OnTestProgramEnd(const testing::UnitTest& unitTest) override {
+    virtual void OnTestProgramEnd(const testing::UnitTest &unitTest) override {
         // Invoke the notifiers for all the disabled tests
-        for (int testCaseIndex = 0; testCaseIndex < unitTest.total_test_case_count(); testCaseIndex++) {
+        for (int testCaseIndex = 0;
+             testCaseIndex < unitTest.total_test_case_count(); testCaseIndex++) {
             auto testCase = unitTest.GetTestCase(testCaseIndex);
             for (int testIndex = 0; testIndex < testCase->total_test_count(); testIndex++) {
                 auto testInfo = testCase->GetTestInfo(testIndex);
                 if (!testInfo->should_run()) {
                     mCurrentTestDescription.reset(
-                            createTestDescription(mEnv, testCase->name(), testInfo->name()));
+                            createTestDescription(
+                                    mEnv,
+                                    testCase->name(),
+                                    testInfo->name()));
                     notify(gRunNotifier.fireTestIgnored);
                     mCurrentTestDescription.reset();
                 }
@@ -115,10 +152,13 @@ public:
 
 private:
     void notify(jmethodID method) {
-        mEnv->CallVoidMethod(mRunNotifier, method, mCurrentTestDescription.get());
+        mEnv->CallVoidMethod(
+                mRunNotifier,
+                method,
+                mCurrentTestDescription.get());
     }
 
-    JNIEnv* mEnv;
+    JNIEnv *mEnv;
     jobject mRunNotifier;
     ScopedLocalRef<jobject> mCurrentTestDescription;
 };
@@ -128,47 +168,88 @@ JNIEXPORT void JNICALL
 Java_com_michael_pong_GtestRunner_nInitialize(JNIEnv *env, jclass, jobject suite) {
     // Initialize gtest, removing the default result printer
     int argc = 1;
-    const char* argv[] = { "gtest_wrapper" };
-    ::testing::InitGoogleTest(&argc, (char**) argv);
+    const char *argv[] = {"gtest_wrapper"};
+    ::testing::InitGoogleTest(
+            &argc,
+            (char **) argv
+    );
 
-    auto& listeners = ::testing::UnitTest::GetInstance()->listeners();
+    auto &listeners = ::testing::UnitTest::GetInstance()->listeners();
     delete listeners.Release(listeners.default_result_printer());
 
     gDescription.clazz = (jclass) env->NewGlobalRef(env->FindClass("org/junit/runner/Description"));
-    gDescription.createTestDescription = env->GetStaticMethodID(gDescription.clazz, "createTestDescription",
-            "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/annotation/Annotation;)Lorg/junit/runner/Description;");
-    gDescription.addChild = env->GetMethodID(gDescription.clazz, "addChild",
-            "(Lorg/junit/runner/Description;)V");
+    gDescription.createTestDescription = env->GetStaticMethodID(
+            gDescription.clazz,
+            "createTestDescription",
+            "(Ljava/lang/String;Ljava/lang/String;[Ljava/lang/annotation/Annotation;)Lorg/junit/runner/Description;"
+    );
+    gDescription.addChild = env->GetMethodID(
+            gDescription.clazz,
+            "addChild",
+            "(Lorg/junit/runner/Description;)V"
+    );
 
     jclass annotations = env->FindClass("java/lang/annotation/Annotation");
-    gEmptyAnnotationsArray = env->NewGlobalRef(env->NewObjectArray(0, annotations, nullptr));
+    gEmptyAnnotationsArray = env->NewGlobalRef(
+            env->NewObjectArray(
+                    0,
+                    annotations,
+                    nullptr
+            ));
 
     gAssertionFailure.clazz = (jclass) env->NewGlobalRef(env->FindClass("java/lang/AssertionError"));
-    gAssertionFailure.ctor = env->GetMethodID(gAssertionFailure.clazz, "<init>", "(Ljava/lang/Object;)V");
+    gAssertionFailure.ctor = env->GetMethodID(
+            gAssertionFailure.clazz,
+            "<init>",
+            "(Ljava/lang/Object;)V"
+    );
 
     gFailure.clazz = (jclass) env->NewGlobalRef(env->FindClass("org/junit/runner/notification/Failure"));
-    gFailure.ctor = env->GetMethodID(gFailure.clazz, "<init>",
-            "(Lorg/junit/runner/Description;Ljava/lang/Throwable;)V");
+    gFailure.ctor = env->GetMethodID(
+            gFailure.clazz,
+            "<init>",
+            "(Lorg/junit/runner/Description;Ljava/lang/Throwable;)V"
+    );
 
     gRunNotifier.clazz = (jclass) env->NewGlobalRef(
             env->FindClass("org/junit/runner/notification/RunNotifier"));
-    gRunNotifier.fireTestStarted = env->GetMethodID(gRunNotifier.clazz, "fireTestStarted",
-            "(Lorg/junit/runner/Description;)V");
-    gRunNotifier.fireTestIgnored = env->GetMethodID(gRunNotifier.clazz, "fireTestIgnored",
-            "(Lorg/junit/runner/Description;)V");
-    gRunNotifier.fireTestFinished = env->GetMethodID(gRunNotifier.clazz, "fireTestFinished",
-            "(Lorg/junit/runner/Description;)V");
-    gRunNotifier.fireTestFailure = env->GetMethodID(gRunNotifier.clazz, "fireTestFailure",
-            "(Lorg/junit/runner/notification/Failure;)V");
+    gRunNotifier.fireTestStarted = env->GetMethodID(
+            gRunNotifier.clazz,
+            "fireTestStarted",
+            "(Lorg/junit/runner/Description;)V"
+    );
+    gRunNotifier.fireTestIgnored = env->GetMethodID(
+            gRunNotifier.clazz,
+            "fireTestIgnored",
+            "(Lorg/junit/runner/Description;)V"
+    );
+    gRunNotifier.fireTestFinished = env->GetMethodID(
+            gRunNotifier.clazz,
+            "fireTestFinished",
+            "(Lorg/junit/runner/Description;)V"
+    );
+    gRunNotifier.fireTestFailure = env->GetMethodID(
+            gRunNotifier.clazz,
+            "fireTestFailure",
+            "(Lorg/junit/runner/notification/Failure;)V"
+    );
 
     auto unitTest = ::testing::UnitTest::GetInstance();
-    for (int testCaseIndex = 0; testCaseIndex < unitTest->total_test_case_count(); testCaseIndex++) {
+    for (int testCaseIndex = 0;
+         testCaseIndex < unitTest->total_test_case_count(); testCaseIndex++) {
         auto testCase = unitTest->GetTestCase(testCaseIndex);
         for (int testIndex = 0; testIndex < testCase->total_test_count(); testIndex++) {
             auto testInfo = testCase->GetTestInfo(testIndex);
-            ScopedLocalRef<jobject> testDescription(env,
-                    createTestDescription(env, testCase->name(), testInfo->name()));
-            addChild(env, suite, testDescription.get());
+            ScopedLocalRef<jobject> testDescription(
+                    env,
+                    createTestDescription(
+                            env,
+                            testCase->name(),
+                            testInfo->name()));
+            addChild(
+                    env,
+                    suite,
+                    testDescription.get());
         }
     }
 }
@@ -176,11 +257,11 @@ Java_com_michael_pong_GtestRunner_nInitialize(JNIEnv *env, jclass, jobject suite
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_michael_pong_GtestRunner_nRun(JNIEnv *env, jclass type, jobject notifier) {
-    auto& listeners = ::testing::UnitTest::GetInstance()->listeners();
+    auto &listeners = ::testing::UnitTest::GetInstance()->listeners();
     JUnitNotifyingListener junitListener{env, notifier};
     listeners.Append(&junitListener);
 
-    (void)RUN_ALL_TESTS();
+    (void) RUN_ALL_TESTS();
     listeners.Release(&junitListener);
     return;
 }

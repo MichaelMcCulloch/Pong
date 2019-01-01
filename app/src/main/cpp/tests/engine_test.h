@@ -11,10 +11,12 @@
 #include "../Engine/Engine.h"
 #include "../logging.h"
 
-TEST(engineTest1, pass) {
+TEST(engineTest1,
+     pass) {
     Engine e = Engine();
 }
 
-TEST(engineTest2, fail) {
+TEST(engineTest2,
+     fail) {
 
 }

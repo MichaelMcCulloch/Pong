@@ -15,9 +15,10 @@
 class Renderer : public BusNode {
 public:
     Renderer() {}
+
     ~Renderer() {}
 
-    void startUp(ANativeWindow*, MessageBus* m);
+    void startUp(ANativeWindow *, MessageBus *m);
 
     void shutDown();
 
@@ -34,7 +35,6 @@ private:
     int32_t width, height;
     float a_Displacement = 0, b_Displacement = 0;
 
-    
 
     void termDisplay();
 

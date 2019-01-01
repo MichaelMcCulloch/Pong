@@ -44,6 +44,10 @@ public class GtestRunner extends Runner {
         nInitialize(mDescription);
     }
 
+    private static native void nInitialize(Description description);
+
+    private static native void nRun(RunNotifier notifier);
+
     @Override
     public Description getDescription() {
         return mDescription;
@@ -53,7 +57,4 @@ public class GtestRunner extends Runner {
     public void run(RunNotifier notifier) {
         nRun(notifier);
     }
-
-    private static native void nInitialize(Description description);
-    private static native void nRun(RunNotifier notifier);
 }

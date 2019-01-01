@@ -42,7 +42,10 @@ extern "C" {
  * "className" looks like "java/lang/String". Aborts on failure.
  * TODO: fix all callers and change the return type to void.
  */
-int jniRegisterNativeMethods(C_JNIEnv* env, const char* className, const JNINativeMethod* gMethods, int numMethods);
+int jniRegisterNativeMethods(C_JNIEnv *env,
+        const char *className,
+        const JNINativeMethod *gMethods,
+        int numMethods);
 
 /*
  * Throw an exception with the specified class and an optional message.
@@ -58,22 +61,22 @@ int jniRegisterNativeMethods(C_JNIEnv* env, const char* className, const JNINati
  *
  * Currently aborts the VM if it can't throw the exception.
  */
-int jniThrowException(C_JNIEnv* env, const char* className, const char* msg);
+int jniThrowException(C_JNIEnv *env, const char *className, const char *msg);
 
 /*
  * Throw a java.lang.NullPointerException, with an optional message.
  */
-int jniThrowNullPointerException(C_JNIEnv* env, const char* msg);
+int jniThrowNullPointerException(C_JNIEnv *env, const char *msg);
 
 /*
  * Throw a java.lang.RuntimeException, with an optional message.
  */
-int jniThrowRuntimeException(C_JNIEnv* env, const char* msg);
+int jniThrowRuntimeException(C_JNIEnv *env, const char *msg);
 
 /*
  * Throw a java.io.IOException, generating the message from errno.
  */
-int jniThrowIOException(C_JNIEnv* env, int errnum);
+int jniThrowIOException(C_JNIEnv *env, int errnum);
 
 /*
  * Return a pointer to a locale-dependent error string explaining errno
@@ -81,39 +84,39 @@ int jniThrowIOException(C_JNIEnv* env, int errnum);
  * This function is thread-safe (unlike strerror) and portable (unlike
  * strerror_r).
  */
-const char* jniStrError(int errnum, char* buf, size_t buflen);
+const char *jniStrError(int errnum, char *buf, size_t buflen);
 
 /*
  * Returns a new java.io.FileDescriptor for the given int fd.
  */
-jobject jniCreateFileDescriptor(C_JNIEnv* env, int fd);
+jobject jniCreateFileDescriptor(C_JNIEnv *env, int fd);
 
 /*
  * Returns the int fd from a java.io.FileDescriptor.
  */
-int jniGetFDFromFileDescriptor(C_JNIEnv* env, jobject fileDescriptor);
+int jniGetFDFromFileDescriptor(C_JNIEnv *env, jobject fileDescriptor);
 
 /*
  * Sets the int fd in a java.io.FileDescriptor.
  */
-void jniSetFileDescriptorOfFD(C_JNIEnv* env, jobject fileDescriptor, int value);
+void jniSetFileDescriptorOfFD(C_JNIEnv *env, jobject fileDescriptor, int value);
 
 /*
  * Returns the reference from a java.lang.ref.Reference.
  */
-jobject jniGetReferent(C_JNIEnv* env, jobject ref);
+jobject jniGetReferent(C_JNIEnv *env, jobject ref);
 
 /*
  * Returns a Java String object created from UTF-16 data either from jchar or,
  * if called from C++11, char16_t (a bitwise identical distinct type).
  */
-jstring jniCreateString(C_JNIEnv* env, const jchar* unicodeChars, jsize len);
+jstring jniCreateString(C_JNIEnv *env, const jchar *unicodeChars, jsize len);
 
 /*
  * Log a message and an exception.
  * If exception is NULL, logs the current exception in the JNI environment.
  */
-void jniLogException(C_JNIEnv* env, int priority, const char* tag, jthrowable exception);
+void jniLogException(C_JNIEnv *env, int priority, const char *tag, jthrowable exception);
 
 #ifdef __cplusplus
 }
@@ -125,67 +128,129 @@ void jniLogException(C_JNIEnv* env, int priority, const char* tag, jthrowable ex
  * inlines these, even on non-optimized builds.
  */
 #if defined(__cplusplus)
-inline int jniRegisterNativeMethods(JNIEnv* env, const char* className, const JNINativeMethod* gMethods, int numMethods) {
-    return jniRegisterNativeMethods(&env->functions, className, gMethods, numMethods);
+
+inline int jniRegisterNativeMethods(JNIEnv *env,
+        const char *className,
+        const JNINativeMethod *gMethods,
+        int numMethods) {
+    return jniRegisterNativeMethods(
+            &env->functions,
+            className,
+            gMethods,
+            numMethods
+    );
 }
 
-inline int jniThrowException(JNIEnv* env, const char* className, const char* msg) {
-    return jniThrowException(&env->functions, className, msg);
+inline int jniThrowException(JNIEnv *env, const char *className, const char *msg) {
+    return jniThrowException(
+            &env->functions,
+            className,
+            msg
+    );
 }
 
-extern "C" int jniThrowExceptionFmt(C_JNIEnv* env, const char* className, const char* fmt, va_list args);
+extern "C" int jniThrowExceptionFmt(C_JNIEnv *env,
+        const char *className,
+        const char *fmt,
+        va_list args);
 
 /*
  * Equivalent to jniThrowException but with a printf-like format string and
  * variable-length argument list. This is only available in C++.
  */
-inline int jniThrowExceptionFmt(JNIEnv* env, const char* className, const char* fmt, ...) {
+inline int jniThrowExceptionFmt(JNIEnv *env, const char *className, const char *fmt, ...) {
     va_list args;
-    va_start(args, fmt);
-    return jniThrowExceptionFmt(&env->functions, className, fmt, args);
+    va_start(args,
+             fmt);
+    return jniThrowExceptionFmt(
+            &env->functions,
+            className,
+            fmt,
+            args
+    );
     va_end(args);
 }
 
-inline int jniThrowNullPointerException(JNIEnv* env, const char* msg) {
-    return jniThrowNullPointerException(&env->functions, msg);
+inline int jniThrowNullPointerException(JNIEnv *env, const char *msg) {
+    return jniThrowNullPointerException(
+            &env->functions,
+            msg
+    );
 }
 
-inline int jniThrowRuntimeException(JNIEnv* env, const char* msg) {
-    return jniThrowRuntimeException(&env->functions, msg);
+inline int jniThrowRuntimeException(JNIEnv *env, const char *msg) {
+    return jniThrowRuntimeException(
+            &env->functions,
+            msg
+    );
 }
 
-inline int jniThrowIOException(JNIEnv* env, int errnum) {
-    return jniThrowIOException(&env->functions, errnum);
+inline int jniThrowIOException(JNIEnv *env, int errnum) {
+    return jniThrowIOException(
+            &env->functions,
+            errnum
+    );
 }
 
-inline jobject jniCreateFileDescriptor(JNIEnv* env, int fd) {
-    return jniCreateFileDescriptor(&env->functions, fd);
+inline jobject jniCreateFileDescriptor(JNIEnv *env, int fd) {
+    return jniCreateFileDescriptor(
+            &env->functions,
+            fd
+    );
 }
 
-inline int jniGetFDFromFileDescriptor(JNIEnv* env, jobject fileDescriptor) {
-    return jniGetFDFromFileDescriptor(&env->functions, fileDescriptor);
+inline int jniGetFDFromFileDescriptor(JNIEnv *env, jobject fileDescriptor) {
+    return jniGetFDFromFileDescriptor(
+            &env->functions,
+            fileDescriptor
+    );
 }
 
-inline void jniSetFileDescriptorOfFD(JNIEnv* env, jobject fileDescriptor, int value) {
-    jniSetFileDescriptorOfFD(&env->functions, fileDescriptor, value);
+inline void jniSetFileDescriptorOfFD(JNIEnv *env, jobject fileDescriptor, int value) {
+    jniSetFileDescriptorOfFD(
+            &env->functions,
+            fileDescriptor,
+            value
+    );
 }
 
-inline jobject jniGetReferent(JNIEnv* env, jobject ref) {
-    return jniGetReferent(&env->functions, ref);
+inline jobject jniGetReferent(JNIEnv *env, jobject ref) {
+    return jniGetReferent(
+            &env->functions,
+            ref
+    );
 }
 
-inline jstring jniCreateString(JNIEnv* env, const jchar* unicodeChars, jsize len) {
-    return jniCreateString(&env->functions, unicodeChars, len);
+inline jstring jniCreateString(JNIEnv *env, const jchar *unicodeChars, jsize len) {
+    return jniCreateString(
+            &env->functions,
+            unicodeChars,
+            len
+    );
 }
 
 #if __cplusplus >= 201103L
-inline jstring jniCreateString(JNIEnv* env, const char16_t* unicodeChars, jsize len) {
-    return jniCreateString(&env->functions, reinterpret_cast<const jchar*>(unicodeChars), len);
+
+inline jstring jniCreateString(JNIEnv *env, const char16_t *unicodeChars, jsize len) {
+    return jniCreateString(
+            &env->functions,
+            reinterpret_cast<const jchar *>(unicodeChars),
+            len
+    );
 }
+
 #endif  // __cplusplus >= 201103L
 
-inline void jniLogException(JNIEnv* env, int priority, const char* tag, jthrowable exception = NULL) {
-    jniLogException(&env->functions, priority, tag, exception);
+inline void jniLogException(JNIEnv *env,
+        int priority,
+        const char *tag,
+        jthrowable exception = NULL) {
+    jniLogException(
+            &env->functions,
+            priority,
+            tag,
+            exception
+    );
 }
 
 #if !defined(DISALLOW_COPY_AND_ASSIGN)
