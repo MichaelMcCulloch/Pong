@@ -32,8 +32,6 @@ target_link_libraries(MessageBusLIB
 add_library(glutilLIB SHARED
         Renderer/glutil/glutil.cpp)
 
-# Renderer
-add_subdirectory(Renderer/glm)
 target_include_directories(glutilLIB PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/>
         )
@@ -45,6 +43,8 @@ target_link_libraries(glutilLIB
         log
         )
 
+# Renderer
+add_subdirectory(Renderer/glm)
 add_library(RendererLIB SHARED
         Renderer/Renderer.cpp
         )
@@ -82,5 +82,4 @@ target_link_libraries(EngineLIB
         )
 
 
-
-#add_subdirectory(tests)
+add_subdirectory(tests)
