@@ -33,9 +33,20 @@ add_library(testDriver
     testDriver.cpp
 )
 
+target_include_directories(testDriver PRIVATE
+        ${CMAKE_SOURCE_DIR}/
+        ${CMAKE_SOURCE_DIR}/MessageBus/
+        ${CMAKE_SOURCE_DIR}/Renderer/
+        ${CMAKE_SOURCE_DIR}/Engine/
+        ${ANDROID_NDK}/sources/android/native_app_glue
+        )
+
 
 target_link_libraries(testDriver
   PRIVATE
+    RendererLIB
+    MessageBusLIB
+    EngineLIB
     gtest
     gtestjni
 )
