@@ -106,15 +106,10 @@ int32_t Engine::handleEvent(AInputEvent *event) {
         const float x = AMotionEvent_getX(event, i);
         const float y = AMotionEvent_getY(event, i);
         LOGV("Motion %d, %f, %f", i, x, y);
-        if (y > 2960/2) { //TODO: Remove magic number
-            //A
-            gamestate.paddleA = x;
-            messageBus->postMessage(_A_POSITION, (void*) &gamestate.paddleA);
-        } else {
-            //B
-            gamestate.paddleB = x;
-            messageBus->postMessage(_B_POSITION, (void*) &gamestate.paddleB);
-        }
+
+        float position[2] = {x,y};
+        messageBus->sendMessage({MessageType ::INPUT_RECEIVED, (void*) position});
+
     }
     return 0 ;
 }
@@ -125,14 +120,14 @@ int32_t Engine::handleEvent(AInputEvent *event) {
 void Engine::handleCommand(int32_t cmd) {
     switch (cmd) {
         case APP_CMD_SAVE_STATE:
-            messageBus->postMessage(_APP_CMD_SAVE_STATE, NULL);
+            messageBus->sendMessage({MessageType ::APP_CMD_SAVE_STATE, (void*)0});
             // The system has asked us to save our current state.  Do so.
             mApp->savedState = malloc(sizeof(struct gamestate));
             *(struct gamestate *) mApp->savedState = gamestate;
             mApp->savedStateSize = sizeof(struct gamestate);
             break;
         case APP_CMD_INIT_WINDOW:
-            messageBus->postMessage(_APP_CMD_INIT_WINDOW,  NULL);
+            messageBus->sendMessage({MessageType ::APP_CMD_INIT_WINDOW,  (void*)0});
             // The window is being shown, get it ready.
             if (mApp->window != NULL) {
                 renderer->startUp(mApp->window,messageBus);
@@ -140,20 +135,20 @@ void Engine::handleCommand(int32_t cmd) {
             }
             break;
         case APP_CMD_TERM_WINDOW:
-            messageBus->postMessage(_APP_CMD_TERM_WINDOW, NULL);
+            messageBus->sendMessage({MessageType ::APP_CMD_TERM_WINDOW, (void*)0});
             // The window is being hidden or closed, clean it up.
             renderer->shutDown();
             break;
         case APP_CMD_LOST_FOCUS:
-            messageBus->postMessage(_APP_CMD_LOST_FOCUS, NULL);
+            messageBus->sendMessage({MessageType ::APP_CMD_LOST_FOCUS, (void*)0});
             animating = 0;
             renderer->drawFrame();
             break;
         case APP_CMD_WINDOW_RESIZED:
-            messageBus->postMessage(_APP_CMD_WINDOW_RESIZED, NULL);
+            messageBus->sendMessage({MessageType ::APP_CMD_WINDOW_RESIZED, (void*)0});
             break;
         case APP_CMD_CONFIG_CHANGED:
-            messageBus->postMessage(_APP_CMD_CONFIG_CHANGED, NULL);
+            messageBus->sendMessage({MessageType ::APP_CMD_CONFIG_CHANGED, (void*)0});
             break;
         default:
             LOGV("Engine: (unused command).");

@@ -7,44 +7,43 @@
 
 #include "logging.h"
 
-enum MessageType{
-    _APP_CMD_SAVE_STATE,
-    _APP_CMD_INIT_WINDOW,
-    _APP_CMD_TERM_WINDOW,
-    _APP_CMD_LOST_FOCUS,
-    _APP_CMD_WINDOW_RESIZED,
-    _APP_CMD_CONFIG_CHANGED,
-    _X_DISPLACEMENT,
-    _Y_DISPLACEMENT,
-    _A_POSITION,
-    _B_POSITION
+enum class MessageType{
+    APP_CMD_SAVE_STATE,
+    APP_CMD_INIT_WINDOW,
+    APP_CMD_TERM_WINDOW,
+    APP_CMD_LOST_FOCUS,
+    APP_CMD_WINDOW_RESIZED,
+    APP_CMD_CONFIG_CHANGED,
+    INPUT_RECEIVED
 };
 
-char* messageTypeToString(MessageType mt);
-
 struct Message {
+    Message(MessageType mt, void *payload);
     MessageType messageType;
+    void getInput(float input[2]);
+
+private:
     void * data;
 };
 
 
 class MessageBus {
 public:
-    MessageBus() {};
-    ~MessageBus() {};
+    MessageBus() = default;
+    ~MessageBus() = default;
 
-    void addReceiver(std::function<void(struct Message)> messageReceiver);
-    void sendMessage(struct Message message);
-    void postMessage(MessageType, void*);
+    void addReceiver(std::function<void(Message)> messageReceiver);
+    void sendMessage(Message message);
     void notify();
 
 private:
-    std::vector<std::function<void(struct Message)>> receivers;
-    std::queue<struct Message> messages;
+    std::vector<std::function<void(Message)>> receivers;
+    std::queue<Message> messages;
 };
 
 class BusNode {
 public:
+
     void startUp(MessageBus*);
     void shutdown();
     virtual void update() {}

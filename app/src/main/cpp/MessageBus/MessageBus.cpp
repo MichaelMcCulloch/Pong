@@ -1,31 +1,5 @@
 #include "MessageBus.h"
 
-char* messageTypeToString(MessageType mt){
-    switch(mt) {
-        case _APP_CMD_SAVE_STATE:
-            return (char *) "_APP_CMD_SAVE_STATE";
-        case _APP_CMD_INIT_WINDOW:
-            return (char *) "_APP_CMD_INIT_WINDOW";
-        case _APP_CMD_TERM_WINDOW:
-            return (char *) "_APP_CMD_TERM_WINDOW";
-        case _APP_CMD_LOST_FOCUS:
-            return (char *) "_APP_CMD_LOST_FOCUS";
-        case _APP_CMD_WINDOW_RESIZED:
-            return (char *) "_APP_CMD_WINDOW_RESIZED";
-        case _APP_CMD_CONFIG_CHANGED:
-            return (char *) "_APP_CMD_CONFIG_CHANGED";
-        case _X_DISPLACEMENT:
-            return (char *) "_X_DISPLACEMENT";
-        case _Y_DISPLACEMENT:
-            return (char *) "_Y_DISPLACEMENT";
-        case _A_POSITION:
-            return (char*) "_A_POSITION";
-        case _B_POSITION:
-            return (char*) "_B_POSITION";
-        default:
-            return (char *) "UNKNOWN";
-    }
-}
 
 void MessageBus::addReceiver(std::function<void(Message)> messageReceiver) {
     receivers.push_back(messageReceiver);
@@ -33,16 +7,7 @@ void MessageBus::addReceiver(std::function<void(Message)> messageReceiver) {
 
 void MessageBus::sendMessage(Message message) {
 
-    LOGV("MsgBus : Received %s", messageTypeToString(message.messageType));
     messages.push(message);
-}
-
-void MessageBus::postMessage(MessageType messageType, void * data){
-    struct Message msg = {
-            messageType,
-            data
-    };
-    sendMessage(msg);
 }
 
 void MessageBus::notify() {
@@ -55,6 +20,47 @@ void MessageBus::notify() {
     }
 }
 
+Message::Message(MessageType mt, void *payload) : messageType(mt){
+    switch (messageType) {
+        case MessageType::APP_CMD_SAVE_STATE: {
+
+        }
+        break;
+        case MessageType::APP_CMD_INIT_WINDOW: {
+
+        }
+        break;
+        case MessageType::APP_CMD_TERM_WINDOW: {
+
+        }
+        break;
+        case MessageType::APP_CMD_LOST_FOCUS: {
+
+        }
+        break;
+        case MessageType::APP_CMD_WINDOW_RESIZED: {
+
+        }
+        break;
+        case MessageType::APP_CMD_CONFIG_CHANGED: {
+
+        }
+        break;
+        case MessageType::INPUT_RECEIVED: {
+            //two floating point numbers
+            size_t size = sizeof(float)*2;
+            data = malloc(size);
+            memcpy(data, payload, size);
+        }
+        break;
+        default:break;
+    }
+}
+
+void Message::getInput(float input[2]) {
+
+    memcpy(input, data, sizeof(float)*2);
+}
 
 std::function<void(Message)> BusNode::getNotifyFunc() {
     //lambda function which takes a message and calls the class onNotify Function with it
@@ -78,3 +84,5 @@ void BusNode::startUp(MessageBus *messageBus) {
 void BusNode::shutdown() {
 
 }
+
+
