@@ -166,6 +166,7 @@ int Renderer::initDisplay(ANativeWindow *window) {
     width = w;
     height = h;
 
+    landscape = width > height;
     return 0;
 }
 
@@ -232,7 +233,6 @@ int Renderer::prepareShaders() {
  * Just the current frame in the display.
  */
 void Renderer::drawFrame() {
-    LOGV("Renderer: drawFrame");
 
     // TODO: draw a triangle which follows touch
     if (display == NULL) {
@@ -412,15 +412,22 @@ void Renderer::termDisplay() {
 
 
 void Renderer::onNotify(Message message) {
-    switch (message.messageType) {
-        case _A_POSITION:
-            a_Displacement = *(float *) message.data;
+    switch (message.messageType){
+        case MessageType :: INPUT_RECEIVED: {
+            LOGV("Renderer: INPUT_RECEIVED");
+                float input[2];
+                message.getInput(input);
+
+                float x = input[0];
+                float y = input[1];
+
+
+                a_Displacement = x;
+                b_Displacement = y;
+            }
             break;
-        case _B_POSITION:
-            b_Displacement = *(float *) message.data;
-            break;
-        case _APP_CMD_WINDOW_RESIZED:
-        case _APP_CMD_CONFIG_CHANGED:
+        case MessageType ::APP_CMD_WINDOW_RESIZED:
+        case MessageType ::APP_CMD_CONFIG_CHANGED:
             // Window was resized or some other configuration changed.
             // Note: we don't handle this event because we check the surface dimensions
             // every frame, so that's how we know it was resized. If you are NOT doing that,

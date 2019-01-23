@@ -34,6 +34,7 @@ private:
     GLuint shader;
     int32_t width, height;
     float a_Displacement = 0, b_Displacement = 0;
+    bool landscape;
 
 
     void termDisplay();
